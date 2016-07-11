@@ -9,7 +9,7 @@ focuses on the database backing the social network service and not on the user i
 NO HTML or other graphical user interface should be produced for this project.
 ##2 Specifics
 ###2.1 Milestone 1: The FaceSpace database schema and example data
-####Due: 11:59PM, July 11, 2016
+#####Due: 11:59PM, July 11, 2016
 Your FaceSpace database includes the basic information found in a social networking system such
 as user profiles, friends, groups, messages, etc. You should choose appropriate data types to make
 up the attributes of each relation that you create to represent miniworld that is described as follows.
@@ -35,7 +35,7 @@ you should should generate sample data to insert into your tables. Generate the 
 at least 100 users, 200 friendships, 10 groups, and 300 messages.
 
 ###2.2 Milestone 2: A JDBC application to manage FaceSpace
-####Due: 11:59PM, July 24, 2016
+#####Due: 11:59PM, July 24, 2016
 You are expected to do your project in Java interfacing Oracle 11g server using JDBC. You must
 develop your project to work on unixs.cis.pitt.edu. It is your responsibility to submit code that
 works in this environment. Further, for all tasks, you are expected to check for and properly react
@@ -93,8 +93,9 @@ system should then delete the user from the groups he or she was a member of usi
 trigger. Note that messages require special handling because they are owned by both the
 sender and the receiver. Therefore, a message is deleted only when both the sender and all
 receivers are deleted. Attention should be paid handling integrity constraints.
-##2.3 Milestone 3: Bringing it all together
-####Due: 11:59PM, August 4, 2016
+
+###2.3 Milestone 3: Bringing it all together
+#####Due: 11:59PM, August 4, 2016
 The primary task for this phase is to create a Java driver program to demonstrate the correctness
 of your social network backend by calling all of the above functions. It may prove quite handy to
 write this driver as you develop the functions as a way to test them. You may also wish to reuse
