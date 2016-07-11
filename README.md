@@ -60,7 +60,7 @@ Your application should implement the following functions for managing FaceSpace
 6. addToGroup
   *Given a user and a group, add the user to the group so long as that would not violate the group’s membership limit.
 7. sendMessageToUser
-Given a message subject, body, recipient, and sender, create a new message.
+  *Given a message subject, body, recipient, and sender, create a new message.
 8. sendMessageToGroup
   *This should operate similarly to sendMessageToUser only it should send the message to everymember currently in the specified group.
 9. displayMessages
