@@ -69,7 +69,7 @@ CREATE TABLE groupMembership
     CONSTRAINT groupMembership_fk1 FOREIGN KEY (groupID) REFERENCES groupInfo(groupID),
     CONSTRAINT groupMembership_fk2 FOREIGN KEY (userID) REFERENCES users(userID)
 );
---trigger needed to ensure groupInfo.memberLimit is enforeced
+--user is prompted via the createGroup() function to set groupInfo.memberLimit
 
 --if recipientID is not null, message will be sent there. Otherwise, check toGroupID and send to all group members
 --add respective rows to groupMessageRecipients
