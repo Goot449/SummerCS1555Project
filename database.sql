@@ -84,7 +84,7 @@ CREATE TABLE messages
     dateSent DATE NOT NULL,
     CONSTRAINT msg_pk PRIMARY KEY (msgID),
     CONSTRAINT msg_fk1 FOREIGN KEY (senderID) REFERENCES users(userID),
-    CONSTRAINT msg_check CHECK (recipientID NOT NULL OR toGroupID NOT NULL)
+    CONSTRAINT msg_check CHECK (recipientID IS NOT NULL AND toGroupID IS NOT NULL)
     --check to make sure there is a recipient or group to receive message
 );
 CREATE SEQUENCE seq_msgID START WITH 1 INCREMENT BY 1;
