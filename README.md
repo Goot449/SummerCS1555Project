@@ -47,52 +47,35 @@ supported by Oracle (e.g., isolation level, locking modes) to make sure that inc
 will not occur. Assume that multiple requests for changes to FaceSpace can be made on behalf of
 multiple different users concurrently.
 Your application should implement the following functions for managing FaceSpace:
-*1. createUser
-Given a name, email address, and date of birth, add a new user to the system.
-*2. initiateFriendship
-Create a pending friendship from one user to another.
-*3. establishFriendship
-Create a bilateral friendship between two users.
-*4. displayFriends
-Given a user, look up all of that user’s establish and pending friendships. Print out this
-information in a nicely formatted way.
-*5. createGroup
-Given a name, description, and membership limit, add a new group to the system.
-*6. addToGroup
-Given a user and a group, add the user to the group so long as that would not violate the
-group’s membership limit.
-*7. sendMessageToUser
+1. createUser
+  *Given a name, email address, and date of birth, add a new user to the system.
+2. initiateFriendship
+  *Create a pending friendship from one user to another.
+3. establishFriendship
+  *Create a bilateral friendship between two users.
+4. displayFriends
+  *Given a user, look up all of that user’s establish and pending friendships. Print out thisinformation in a nicely formatted way.
+5. createGroup
+  *Given a name, description, and membership limit, add a new group to the system.
+6. addToGroup
+  *Given a user and a group, add the user to the group so long as that would not violate the group’s membership limit.
+7. sendMessageToUser
 Given a message subject, body, recipient, and sender, create a new message.
-*8. sendMessageToGroup
-This should operate similarly to sendMessageToUser only it should send the message to every
-member currently in the specified group.
-*9. displayMessages
-Given a user, look up all of the messages sent to that user (either directly or via a group
-that they belong to). Your Java program should print out the user’s messages in a nicely
+8. sendMessageToGroup
+  *This should operate similarly to sendMessageToUser only it should send the message to everymember currently in the specified group.
+9. displayMessages
+  *Given a user, look up all of the messages sent to that user (either directly or via a groupthat they belong to). Your Java program should print out the user’s messages in a nicely
 formatted way.
-*10. displayNewMessages
-Operates similarly to displayMessages, but only displays messages sent since the user’s last
-login.
-*11. searchForUser
-This provides a simple search function for the system. Given a string on which to match any
-user in the system, any item in this string must be matched against any significant field of a
-user’s profile. That is if the user searches for “xyz abc”, the results should be the set of all
-profiles that match “xyz” union the set of all profiles that matches “abc”. The names of all
-matching users should be printed out in a nicely formatted way.
-*12. threeDegrees
-This task explores the user’s social network. Given two users (userA and userB), find a path,
-if one exists, between the userA and the userB with at most 3 hop between them. A hop is
-defined as a friendship between any two users. The path should be printed out in a nicely
-formatted way.
-*13. topMessagers
-Display the top k who have sent or received the highest number of messages during for the
-past x months. x and k should be an input parameters to this function.
-*14. dropUser
-Remove a user and all of their information from the system. When a user is removed, the
-system should then delete the user from the groups he or she was a member of using a
-trigger. Note that messages require special handling because they are owned by both the
-sender and the receiver. Therefore, a message is deleted only when both the sender and all
-receivers are deleted. Attention should be paid handling integrity constraints.
+10. displayNewMessages
+  *Operates similarly to displayMessages, but only displays messages sent since the user’s last login.
+11. searchForUser
+  *This provides a simple search function for the system. Given a string on which to match any user in the system, any item in this string must be matched against any significant field of a user’s profile. That is if the user searches for “xyz abc”, the results should be the set of all profiles that match “xyz” union the set of all profiles that matches “abc”. The names of all matching users should be printed out in a nicely formatted way.
+12. threeDegrees
+  *This task explores the user’s social network. Given two users (userA and userB), find a path, if one exists, between the userA and the userB with at most 3 hop between them. A hop isdefined as a friendship between any two users. The path should be printed out in a nicely formatted way.
+13. topMessagers
+  *Display the top k who have sent or received the highest number of messages during for the past x months. x and k should be an input parameters to this function.
+14. dropUser
+  *Remove a user and all of their information from the system. When a user is removed, the system should then delete the user from the groups he or she was a member of using a trigger. Note that messages require special handling because they are owned by both the sender and the receiver. Therefore, a message is deleted only when both the sender and all receivers are deleted. Attention should be paid handling integrity constraints.
 
 ###2.3 Milestone 3: Bringing it all together
 #####Due: 11:59PM, August 4, 2016
