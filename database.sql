@@ -22,7 +22,7 @@ CREATE TABLE users
     dob DATE NOT NULL,
     lastLogin TIMESTAMP,
     CONSTRAINT users_pk PRIMARY KEY (userID),
-    CONSTRAINT users_email UNIQUE (email) 
+    CONSTRAINT users_email UNIQUE (email)
     --an email can only be registered under one user
 );
 --Allows new users to be added without needing to know the next available usersID
@@ -78,7 +78,7 @@ CREATE TABLE messages
     msgID NUMBER(10) NOT NULL,
     senderID NUMBER(10) NOT NULL,
     recipientID NUMBER(10) DEFAULT NULL,
-    toGroupID NUMBER(10) DEFAULT NULL, 
+    toGroupID NUMBER(10) DEFAULT NULL,
     subject VARCHAR2(50) NOT NULL,
     message VARCHAR2(100) NOT NULL,
     dateSent DATE NOT NULL,
@@ -89,11 +89,13 @@ CREATE TABLE messages
 );
 CREATE SEQUENCE seq_msgID START WITH 1 INCREMENT BY 1;
 
-CREATE TABLE groupMessageRecipients
-(
-    msgID NUMBER(10) NOT NULL,
-    recipientID NUMBER(10) NOT NULL,
-    CONSTRAINT groupMessageRecipients_pk PRIMARY KEY (msgID, recipientID),
-    CONSTRAINT groupMessageRecipients_fk1 FOREIGN KEY (msgID) REFERENCES messages(msgID),
-    CONSTRAINT groupMessageRecipients_fk2 FOREIGN KEY (recipientID) REFERENCES users(userID)
-);
+--CREATE TABLE groupMessageRecipients
+--(
+--    msgID NUMBER(10) NOT NULL,
+--    recipientID NUMBER(10) NOT NULL,
+--    CONSTRAINT groupMessageRecipients_pk PRIMARY KEY (msgID, recipientID),
+--    CONSTRAINT groupMessageRecipients_fk1 FOREIGN KEY (msgID) REFERENCES messages(msgID),
+--    CONSTRAINT groupMessageRecipients_fk2 FOREIGN KEY (recipientID) REFERENCES users(userID)
+--);
+
+start testinsert.sql
