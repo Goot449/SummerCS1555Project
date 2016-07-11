@@ -58,8 +58,8 @@ CREATE TABLE groupInfo
     memberLimit VARCHAR2(5) NOT NULL,
     CONSTRAINT group_pk PRIMARY KEY (groupID)
 );
-
 CREATE SEQUENCE seq_groupID START WITH 1 INCREMENT BY 1;
+
 CREATE TABLE groupMembership
 (
     membershipID NUMBER(10) NOT NULL,
@@ -98,3 +98,21 @@ CREATE TABLE groupMessageRecipients
     CONSTRAINT groupMessageRecipients_fk1 FOREIGN KEY (msgID) REFERENCES messages(msgID),
     CONSTRAINT groupMessageRecipients_fk2 FOREIGN KEY (recipientID) REFERENCES users(userID)
 );
+
+CREATE OR REPLACE TRIGGER GroupMessage
+    AFTER INSERT
+    ON messages
+    FOR EACH ROW
+    BEGIN
+        IF(:new.toGroupID IS NOT NULL) THEN
+            FOR cursor IN (SELECT GM.userID FROM groupMembership GM
+                WHERE GM.groupID = :new.toGroupID)
+            LOOP
+                INSERT INTO groupMessageRecipients VALUES(:new.msgID, cursor.userID);
+            END LOOP;
+        END IF;
+    END;
+/
+
+
+
