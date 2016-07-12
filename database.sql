@@ -1,3 +1,6 @@
+--create database schema
+--populate database with data
+
 DROP TABLE users CASCADE CONSTRAINTS;
 DROP TABLE friends CASCADE CONSTRAINTS;
 DROP TABLE pendingFriends CASCADE CONSTRAINTS;
@@ -74,6 +77,7 @@ CREATE TABLE groupMembership
 
 --if recipientID is not null, message will be sent there. Otherwise, check toGroupID and send to all group members
 --add respective rows to groupMessageRecipients
+--****possibly add a constraint that prevents a user from sending a message to a group they are not a member of****
 CREATE TABLE messages
 (
     msgID NUMBER(10) NOT NULL,
@@ -101,6 +105,8 @@ CREATE TABLE groupMessageRecipients
     CONSTRAINT groupMessageRecipients_fk2 FOREIGN KEY (recipientID) REFERENCES users(userID)
 );
 
+--When a message to a group is inserted into Messages
+--This trigger will populate the groupMessageRecipients table with the recipients of the message in the group
 CREATE OR REPLACE TRIGGER GroupMessage
     AFTER INSERT
     ON messages
@@ -108,7 +114,8 @@ CREATE OR REPLACE TRIGGER GroupMessage
     BEGIN
         IF(:new.toGroupID IS NOT NULL) THEN
             FOR cursor IN (SELECT GM.userID FROM groupMembership GM
-                WHERE GM.groupID = :new.toGroupID)
+                --do not want to insert the sender as a recipient
+                WHERE (GM.groupID = :new.toGroupID AND GM.userID <> :new.senderID))
             LOOP
                 INSERT INTO groupMessageRecipients VALUES(:new.msgID, cursor.userID);
             END LOOP;
@@ -478,6 +485,7 @@ INSERT INTO groupMembership VALUES (40,10,3);
 INSERT INTO groupMembership VALUES (41,10,4);
 
 --generate 300 messages
+--messages sent to a group only come from a member in the group
 INSERT INTO messages VALUES(1  ,1  ,2 ,NULL,'Soccer Game','cant wait for the game!',TO_DATE('01/01/2016','mm/dd/yyyy'));
 INSERT INTO messages VALUES(2  ,2  ,10,NULL,'Soccer Game','cant wait for the game!',TO_DATE('01/01/2016','mm/dd/yyyy'));
 INSERT INTO messages VALUES(3  ,3  ,10,NULL,'Soccer Game','cant wait for the game!',TO_DATE('01/01/2016','mm/dd/yyyy'));
@@ -628,6 +636,7 @@ INSERT INTO messages VALUES(147,47 ,10,NULL,'message','databases get get a littl
 INSERT INTO messages VALUES(148,48 ,10,NULL,'message','databases get get a little annoying',TO_DATE('11/06/2016','mm/dd/yyyy'));
 INSERT INTO messages VALUES(149,49 ,2 ,NULL,'message','databases get get a little annoying',TO_DATE('11/07/2016','mm/dd/yyyy'));
 INSERT INTO messages VALUES(150,50 ,10,NULL,'message','databases get get a little annoying',TO_DATE('11/08/2016','mm/dd/yyyy'));
+--group messages
 INSERT INTO messages VALUES(151,2  ,NULL,1 ,'Group Announcement','Everyong must be nice to one another'           ,TO_DATE('01/09/2016','mm/dd/yyyy'));
 INSERT INTO messages VALUES(152,1  ,NULL,1 ,'Group Announcement','We are meeting up tomorrow'                     ,TO_DATE('01/02/2016','mm/dd/yyyy'));
 INSERT INTO messages VALUES(153,1  ,NULL,1 ,'Group Announcement','This group is doing well'                       ,TO_DATE('01/03/2016','mm/dd/yyyy'));
