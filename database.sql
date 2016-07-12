@@ -55,7 +55,7 @@ CREATE TABLE groupInfo
     groupID NUMBER(10) NOT NULL,
     name VARCHAR2(50) NOT NULL,
     description VARCHAR2(255),
-    memberLimit VARCHAR2(5) NOT NULL,
+    memberLimit NUMBER(5) NOT NULL,
     CONSTRAINT group_pk PRIMARY KEY (groupID)
 );
 CREATE SEQUENCE seq_groupID START WITH 1 INCREMENT BY 1;
@@ -416,4 +416,13 @@ INSERT INTO friends VALUES (49, 91, TO_DATE('7/11/2016', 'mm/dd/yyyy'));
 INSERT INTO friends VALUES (50, 90, TO_DATE('7/11/2016', 'mm/dd/yyyy'));
 INSERT INTO friends VALUES (50, 89, TO_DATE('7/11/2016', 'mm/dd/yyyy'));
 
-
+INSERT INTO groupInfo VALUES (1, 'Soccer', 'For soccer players', 50);
+INSERT INTO groupInfo VALUES (2, 'Football', 'For football players', 50);
+INSERT INTO groupInfo VALUES (3, 'Hockey', 'For hockey players', 50);
+INSERT INTO groupInfo VALUES (4, 'Baseball', 'For baseball players', 50);
+INSERT INTO groupInfo VALUES (5, 'Softball', 'For softball players', 50);
+INSERT INTO groupInfo VALUES (6, 'Rugby', 'For rugby players', 50);
+INSERT INTO groupInfo VALUES (7, 'Tennis', 'For tennis players', 50);
+INSERT INTO groupInfo VALUES (8, 'Frisbee', 'For frisbee players', 50);
+INSERT INTO groupInfo VALUES (9, 'Baseketball', 'For baseketball players', 50);
+INSERT INTO groupInfo VALUES (10, 'Golf', 'For golf players', 50);
