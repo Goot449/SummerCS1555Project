@@ -11,23 +11,122 @@ public class FaceSpaceApp {
     static Scanner scanner = new Scanner(System.in); //used to read user input
 
     public FaceSpaceApp(){
-        System.out.println("in FaceSpaceApp method");
+        System.out.println("\n"+"Welcome to FaceSpace!");
         //This is where the main app will interface with the user to call the different methods
-        String command;
+        int command;
         while(true){
-            System.out.print("Please Enter a Command: ");
-            command = scanner.next();
-            if(command.equals("yay")){
-                System.out.println("we are gonna keep going");
-            }
-            else if(command.equalsIgnoreCase("quit")){
-                System.out.println("time to go");
+            System.out.print("\n"+"Please Enter a Command:"+"\n"+
+                "0 - Quit"+"\n"+"1 - createUser"+"\n"+"2 - initiateFriendship"+"\n"+"3 - establishFriendShip"+"\n"+
+                "4 - displayFriends"+"\n"+"5 - createGroup"+"\n"+"6 - addToGroup"+"\n"+"7 - sendMessageToUser"+"\n"+
+                "8 - sendMessageToGroup"+"\n"+"9 - displayMessages"+"\n"+"10 - displayNewMessages"+"\n"+
+                "11 - searchForUser"+"\n"+"12 - threeDegrees"+"\n"+"13 - topMessagers"+"\n"+"14 - dropUser"+"\n"+"Command: ");
+            command = Integer.parseInt(scanner.next());
+
+            if(command == 0){
+                System.out.println("Logging Out");
                 break;
+            }
+            else if(command == 1){
+                createUser();
+            }
+            else if(command == 2){
+                initiateFriendship();
+            }
+            else if(command == 3){
+                establishFriendShip();
+            }
+            else if(command == 4){
+                displayFriends();
+            }
+            else if(command == 5){
+                createGroup();
+            }
+            else if(command == 6){
+                addToGroup();
+            }
+            else if(command == 7){
+                sendMessageToUser();
+            }
+            else if(command == 8){
+                sendMessageToGroup();
+            }
+            else if(command == 9){
+                displayMessages();
+            }
+            else if(command == 10){
+                displayNewMessages();
+            }
+            else if(command == 11){
+                searchForUser();
+            }
+            else if(command == 12){
+                threeDegrees();
+            }
+            else if(command == 13){
+                topMessagers();
+            }
+            else if(command == 14){
+                dropUser();
             }
             else{
                 System.out.println("Command Not Recognized!");
             }
         }
+    }
+
+    public void createUser(){
+
+    }
+
+    public void initiateFriendship(){
+
+    }
+
+    public void establishFriendShip(){
+
+    }
+
+    public void displayFriends(){
+
+    }
+
+    public void createGroup(){
+
+    }
+
+    public void addToGroup(){
+
+    }
+
+    public void sendMessageToUser(){
+
+    }
+
+    public void sendMessageToGroup(){
+
+    }
+
+    public void displayMessages(){
+
+    }
+
+    public void displayNewMessages(){
+
+    }
+
+    public void searchForUser(){
+
+    }
+
+    public void threeDegrees(){
+
+    }
+
+    public void topMessagers(){
+
+    }
+
+    public void dropUser(){
 
     }
 
