@@ -1,6 +1,7 @@
 import java.sql.*;
 import java.text.ParseException;
 import java.util.Scanner;
+import java.text.SimpleDateFormat;
 
 public class FaceSpaceApp {
     private static Connection connection; //used to hold the jdbc connection to the DB
@@ -27,7 +28,12 @@ public class FaceSpaceApp {
                 break;
             }
             else if(command == 1){
-                createUser();
+                String fname = "";
+                String lname = "";
+                String email = "";
+                String dob = "";
+                
+                createUser(fname, lname, email, dob);
             }
             else if(command == 2){
                 initiateFriendship();
@@ -74,8 +80,61 @@ public class FaceSpaceApp {
         }
     }
 
-    public void createUser(){
+    public void createUser(String fname, String lname, String email, String dob){
+        try{
+            java.util.Date date = null;
+            if (!dob.isEmpty())
+            {
+                SimpleDateFormat sdf = new SimpleDateFormat("mm/dd/yyyy");
+                date = sdf.parse(dob);
+                if (!dob.equals(sdf.format(date))) {
+                    date = null;
+                }
+            }
+            // checks for valid user data
+            if( !fname.isEmpty() && !lname.isEmpty() && !email.isEmpty() &&  date != null)
+            {
+                // query number of users to increment to next user id
+                statement = connection.createStatement();
+                String selectQuery = "SELECT COUNT(*) AS total FROM users"; 
+                resultSet = statement.executeQuery(selectQuery);
+                resultSet.next();
+                int ids = resultSet.getInt("total");
+                ids++;
+                
+                // create insert query and fill in user fields
+                query = "insert into users values (?,?,?,?, TO_DATE(?, 'mm/dd/yyyy'), ?)";
+                prepStatement = connection.prepareStatement(query);
+                prepStatement.setLong(1, ids); 
+                prepStatement.setString(2, fname);
+                prepStatement.setString(3, lname);
+                prepStatement.setString(4, email);
+                prepStatement.setString(5, dob);
+                prepStatement.setTimestamp(6, java.sql.Timestamp.valueOf(java.time.LocalDateTime.now()));
 
+                // run insert and notify user of success
+                prepStatement.executeUpdate();
+                resultSet.close();
+                System.out.println("User Account Created!");
+            } else {
+                System.out.println("Invalid user input: Make sure no values are empty and the date format is mm/dd/yyyy");
+            }
+        }
+        catch(SQLException Ex) {
+            System.out.println("Error running the sample queries.  Machine Error: " +
+                       Ex.toString());
+        } 
+        catch (ParseException ex) {
+            System.out.println("Invalid user input: Make sure no values are empty and the date format is mm/dd/yyyy");
+        }
+        finally{
+            try {
+                if (statement != null) statement.close();
+                if (prepStatement != null) prepStatement.close();
+            } catch (SQLException e) {
+                System.out.println("Cannot close Statement. Machine error: "+e.toString());
+            }
+        }
     }
 
     public void initiateFriendship(){
