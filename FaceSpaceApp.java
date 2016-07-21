@@ -13,6 +13,21 @@ public class FaceSpaceApp {
     public FaceSpaceApp(){
         System.out.println("in FaceSpaceApp method");
         //This is where the main app will interface with the user to call the different methods
+        String command;
+        while(true){
+            System.out.print("Please Enter a Command: ");
+            command = scanner.next();
+            if(command.equals("yay")){
+                System.out.println("we are gonna keep going");
+            }
+            else if(command.equalsIgnoreCase("quit")){
+                System.out.println("time to go");
+                break;
+            }
+            else{
+                System.out.println("Command Not Recognized!");
+            }
+        }
 
     }
 
