@@ -89,7 +89,7 @@ public class FaceSpaceApp {
                     displayMessages(userEmail);
                 }
                 else if(command == 10){
-                    String userEmail = "timjohn@gmail.com";
+                    String userEmail = "";
                     
                     displayNewMessages(userEmail);
                 }
@@ -97,7 +97,10 @@ public class FaceSpaceApp {
                     searchForUser();
                 }
                 else if(command == 12){
-                    threeDegrees();
+                    String emailA = "";
+                    String emailB = "";
+                    
+                    threeDegrees(emailA, emailB);
                 }
                 else if(command == 13){
                     topMessagers();
@@ -782,8 +785,131 @@ public class FaceSpaceApp {
 
     }
 
-    public void threeDegrees(){
+    public void threeDegrees(String emailA, String emailB){
+        try{
+            long AID = 0;
+            long BID = 0;
+            
+            // checks for valid user data
+            if( !emailA.isEmpty() && !emailB.isEmpty() ){
+                // query requester's ID
+                String selectQuery = "SELECT userID FROM users WHERE email = ?"; 
+                prepStatement = connection.prepareStatement(selectQuery);
+                prepStatement.setString(1, emailA);
+                resultSet = prepStatement.executeQuery();
+                if(resultSet.next()){
+                    AID = resultSet.getLong("userID");
 
+                    // query requested to ID
+                    selectQuery = "SELECT userID FROM users WHERE email = ?"; 
+                    prepStatement = connection.prepareStatement(selectQuery);
+                    prepStatement.setString(1, emailB);
+                    resultSet = prepStatement.executeQuery();
+                    if(resultSet.next()) {
+                        BID = resultSet.getLong("userID");
+
+                        // find one hop friends
+                        selectQuery = "SELECT userID2 FROM friends WHERE userID1 = ?"; 
+                        prepStatement = connection.prepareStatement(selectQuery);
+                        prepStatement.setLong(1, AID);
+                        resultSet = prepStatement.executeQuery();
+                        Stack hop1Stack = new Stack();
+                        while(resultSet.next()){
+                            long messageID = resultSet.getLong("userID2");
+                            hop1Stack.push(new Long(messageID));
+                        }
+                        selectQuery = "SELECT userID1 FROM friends WHERE userID2 = ?"; 
+                        prepStatement = connection.prepareStatement(selectQuery);
+                        prepStatement.setLong(1, AID);
+                        resultSet = prepStatement.executeQuery();
+                        while(resultSet.next()){
+                            long friend1ID = resultSet.getLong("userID1");
+                            hop1Stack.push(new Long(friend1ID));
+                        }
+                        
+                        while(!hop1Stack.empty()){
+                            Long hop1ID = (Long)hop1Stack.pop();
+                            if(hop1ID == BID) {
+                                System.out.println(AID + " -> " + BID);
+                            } else {
+                                // find two hop friends
+                                selectQuery = "SELECT userID2 FROM friends WHERE userID1 = ?"; 
+                                prepStatement = connection.prepareStatement(selectQuery);
+                                prepStatement.setLong(1, hop1ID);
+                                resultSet = prepStatement.executeQuery();
+                                Stack hop2Stack = new Stack();
+                                while(resultSet.next()){
+                                    long friend2ID = resultSet.getLong("userID2");
+                                    if(friend2ID != AID){
+                                        hop2Stack.push(new Long(friend2ID));
+                                    }
+                                }
+                                selectQuery = "SELECT userID1 FROM friends WHERE userID2 = ?"; 
+                                prepStatement = connection.prepareStatement(selectQuery);
+                                prepStatement.setLong(1, hop1ID);
+                                resultSet = prepStatement.executeQuery();
+                                while(resultSet.next()){
+                                    long friend2ID = resultSet.getLong("userID1");
+                                    hop2Stack.push(new Long(friend2ID));
+                                }
+                                
+                                while(!hop2Stack.empty()){
+                                    Long hop2ID = (Long)hop2Stack.pop();
+                                    if(hop2ID == BID) {
+                                        System.out.println(AID + " -> " + hop1ID + " -> " + BID);
+                                    } else {
+                                        // find three hop friends
+                                        selectQuery = "SELECT userID2 FROM friends WHERE userID1 = ?"; 
+                                        prepStatement = connection.prepareStatement(selectQuery);
+                                        prepStatement.setLong(1, hop2ID);
+                                        resultSet = prepStatement.executeQuery();
+                                        Stack hop3Stack = new Stack();
+                                        while(resultSet.next()){
+                                            long friend3ID = resultSet.getLong("userID2");
+                                            hop3Stack.push(new Long(friend3ID));
+                                        }
+                                        selectQuery = "SELECT userID1 FROM friends WHERE userID2 = ?"; 
+                                        prepStatement = connection.prepareStatement(selectQuery);
+                                        prepStatement.setLong(1, hop2ID);
+                                        resultSet = prepStatement.executeQuery();
+                                        while(resultSet.next()){
+                                            long friend3ID = resultSet.getLong("userID1");
+                                            hop3Stack.push(new Long(friend3ID));
+                                        }
+                                        
+                                        while(!hop3Stack.empty()){
+                                            Long hop3ID = (Long)hop3Stack.pop();
+                                            if(hop3ID == BID) {
+                                                System.out.println(AID + " -> " + hop1ID + " -> " + hop2ID + " -> " + BID);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        System.out.println("Invalid requested to email");
+                    }
+                } else {
+                    System.out.println("Invalid requester email");
+                }
+                resultSet.close();
+            } else {
+                System.out.println("Invalid user input: Make sure no values are empty");
+            }
+        }
+        catch(SQLException Ex) {
+            System.out.println("Error running the sample queries.  Machine Error: " +
+                       Ex.toString());
+        } 
+        finally{
+            try {
+                if (statement != null) statement.close();
+                if (prepStatement != null) prepStatement.close();
+            } catch (SQLException e) {
+                System.out.println("Cannot close Statement. Machine error: "+e.toString());
+            }
+        }
     }
 
     public void topMessagers(){
