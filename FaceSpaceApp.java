@@ -179,15 +179,15 @@ public class FaceSpaceApp {
                         toID = resultSet.getLong("userID");
 
                         // check if friendship exists
-                        selectQuery = "SELECT COUNT(*) FROM friends WHERE (userID1 = ? and userID2 = ?) or (userID1 = ? and userID2 = ?)"; 
+                        selectQuery = "SELECT userID1 FROM friends WHERE (userID1 = ? and userID2 = ?) or (userID1 = ? and userID2 = ?)"; 
                         prepStatement = connection.prepareStatement(selectQuery);
-                        prepStatement.getLong(1, requestID);
-                        prepStatement.getLong(2, toID);
-                        prepStatement.getLong(3, toID);
-                        prepStatement.getLong(4, requestID);
+                        prepStatement.setLong(1, requestID);
+                        prepStatement.setLong(2, toID);
+                        prepStatement.setLong(3, toID);
+                        prepStatement.setLong(4, requestID);
                         resultSet = prepStatement.executeQuery();
                         if(!resultSet.next()){
-                            
+                        
                             // create insert query and fill in user fields
                             query = "insert into pendingFriends values (?,?)";
                             prepStatement = connection.prepareStatement(query);
@@ -242,7 +242,8 @@ public class FaceSpaceApp {
             
             // checks for valid user data
             if( !user1Email.isEmpty() && !user2Email.isEmpty() ){
-                // query user1's ID
+
+            // query user1's ID
                 String selectQuery = "SELECT userID FROM users WHERE email = ?"; 
                 prepStatement = connection.prepareStatement(selectQuery);
                 prepStatement.setString(1, user1Email);
@@ -259,14 +260,14 @@ public class FaceSpaceApp {
                         user2ID = resultSet.getLong("userID");
 
                         // find ID of confirmer to update last login
-                        selectQuery = "select toID from pendingFriends where toID = ? or toID = ?)";
+                        selectQuery = "select toID from pendingFriends where toID = ? or toID = ?";
                         prepStatement = connection.prepareStatement(selectQuery);
                         prepStatement.setLong(1, user1ID); 
                         prepStatement.setLong(2, user2ID);
                         resultSet = prepStatement.executeQuery();
                         if(resultSet.next()){
-                            long confirmer = resultSet.getLong("userID");
-                            
+                            long confirmer = resultSet.getLong("toID");
+
                             // create insert query and fill in friendship
                             query = "insert into friends values (?,?,?)";
                             prepStatement = connection.prepareStatement(query);
