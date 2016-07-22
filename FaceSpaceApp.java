@@ -2,6 +2,7 @@ import java.sql.*;
 import java.text.ParseException;
 import java.util.Scanner;
 import java.text.SimpleDateFormat;
+import java.util.Stack;
 
 public class FaceSpaceApp {
     private static Connection connection; //used to hold the jdbc connection to the DB
@@ -83,10 +84,14 @@ public class FaceSpaceApp {
                     sendMessageToGroup(subject, body, groupName, senderEmail);
                 }
                 else if(command == 9){
-                    displayMessages();
+                    String userEmail = "";
+                    
+                    displayMessages(userEmail);
                 }
                 else if(command == 10){
-                    displayNewMessages();
+                    String userEmail = "timjohn@gmail.com";
+                    
+                    displayNewMessages(userEmail);
                 }
                 else if(command == 11){
                     searchForUser();
@@ -610,12 +615,167 @@ public class FaceSpaceApp {
         }
     }
 
-    public void displayMessages(){
-
+    public void displayMessages(String userEmail){
+        try{            
+            long userID;
+            
+            // checks for valid user data
+            if( !userEmail.isEmpty() ){
+                
+                // query user's ID
+                String selectQuery = "SELECT userID FROM users WHERE email = ?"; 
+                prepStatement = connection.prepareStatement(selectQuery);
+                prepStatement.setString(1, userEmail);
+                resultSet = prepStatement.executeQuery();
+                if(resultSet.next()){
+                    userID = resultSet.getLong("userID");
+                
+                    // display all messages to user
+                    selectQuery = "SELECT * FROM messages WHERE recipientID = ?"; 
+                    prepStatement = connection.prepareStatement(selectQuery);
+                    prepStatement.setLong(1, userID);
+                    resultSet = prepStatement.executeQuery();
+                    while(resultSet.next()) {
+                        System.out.println(resultSet.getString("subject") + "    " + resultSet.getString("message"));
+                    }
+                    
+                    // display all messages to user's groups
+                    selectQuery = "SELECT * FROM groupMessageRecipients WHERE recipientID = ?"; 
+                    prepStatement = connection.prepareStatement(selectQuery);
+                    prepStatement.setLong(1, userID);
+                    resultSet = prepStatement.executeQuery();
+                    Stack resultStack = new Stack();
+                    while(resultSet.next()){
+                        long messageID = resultSet.getLong("msgID");
+                        resultStack.push(new Long(messageID));
+                    }
+                    
+                    while(!resultStack.empty()){
+                        selectQuery = "SELECT * FROM messages WHERE msgID = ?"; 
+                        prepStatement = connection.prepareStatement(selectQuery);
+                        Long messageID = (Long)resultStack.pop();
+                        prepStatement.setLong(1, messageID);
+                        resultSet = prepStatement.executeQuery();
+                        while(resultSet.next()) {
+                            System.out.println(resultSet.getString("subject") + "    " + resultSet.getString("message"));
+                        }
+                    }
+                    
+                    // change last login time of sender
+                    query = "UPDATE users SET lastLogin=? WHERE userID = ?";
+                    prepStatement = connection.prepareStatement(query);
+                    java.util.Date date = new java.util.Date();
+                    Timestamp current = new Timestamp(date.getTime());
+                    prepStatement.setTimestamp(1, current);
+                    prepStatement.setLong(2, userID);
+                    prepStatement.executeUpdate(); 
+                    
+                } else {
+                    System.out.println("Invalid user email");
+                }
+                resultSet.close();
+            } else {
+                System.out.println("Invalid user input: Make sure no values are empty");
+            }
+        }
+        catch(SQLException Ex) {
+            System.out.println("Error running the sample queries.  Machine Error: " +
+                       Ex.toString());
+        } 
+        finally{
+            try {
+                if (statement != null) statement.close();
+                if (prepStatement != null) prepStatement.close();
+            } catch (SQLException e) {
+                System.out.println("Cannot close Statement. Machine error: "+e.toString());
+            }
+        }
     }
 
-    public void displayNewMessages(){
-
+    public void displayNewMessages(String userEmail){
+        try{            
+            long userID;
+            Timestamp lastLogin;
+            
+            // checks for valid user data
+            if( !userEmail.isEmpty() ){
+                
+                // query user's ID
+                String selectQuery = "SELECT userID, lastLogin FROM users WHERE email = ?"; 
+                prepStatement = connection.prepareStatement(selectQuery);
+                prepStatement.setString(1, userEmail);
+                resultSet = prepStatement.executeQuery();
+                if(resultSet.next()){
+                    userID = resultSet.getLong("userID");
+                    lastLogin = resultSet.getTimestamp("lastLogin");
+                    if(lastLogin == null) {
+                        displayMessages(userEmail);
+                    } else {
+                
+                        // display all messages to user
+                        selectQuery = "SELECT * FROM messages WHERE recipientID = ?"; 
+                        prepStatement = connection.prepareStatement(selectQuery);
+                        prepStatement.setLong(1, userID);
+                        resultSet = prepStatement.executeQuery();
+                        while(resultSet.next()) {
+                            if(lastLogin.before(new Timestamp(resultSet.getDate("dateSent").getTime()))){
+                                System.out.println(resultSet.getString("subject") + "    " + resultSet.getString("message"));
+                            }
+                        }
+                        
+                        // display all messages to user's groups
+                        selectQuery = "SELECT * FROM groupMessageRecipients WHERE recipientID = ?"; 
+                        prepStatement = connection.prepareStatement(selectQuery);
+                        prepStatement.setLong(1, userID);
+                        resultSet = prepStatement.executeQuery();
+                        Stack resultStack = new Stack();
+                        while(resultSet.next()){
+                            long messageID = resultSet.getLong("msgID");
+                            resultStack.push(new Long(messageID));
+                        }
+                        
+                        while(!resultStack.empty()){
+                            selectQuery = "SELECT * FROM messages WHERE msgID = ?"; 
+                            prepStatement = connection.prepareStatement(selectQuery);
+                            Long messageID = (Long)resultStack.pop();
+                            prepStatement.setLong(1, messageID);
+                            resultSet = prepStatement.executeQuery();
+                            while(resultSet.next()) {
+                                if(lastLogin.before(new Timestamp(resultSet.getDate("dateSent").getTime()))){
+                                    System.out.println(resultSet.getString("subject") + "    " + resultSet.getString("message"));
+                                }
+                            }
+                        }
+                        
+                        // change last login time of sender
+                        query = "UPDATE users SET lastLogin=? WHERE userID = ?";
+                        prepStatement = connection.prepareStatement(query);
+                        java.util.Date date = new java.util.Date();
+                        Timestamp current = new Timestamp(date.getTime());
+                        prepStatement.setTimestamp(1, current);
+                        prepStatement.setLong(2, userID);
+                        prepStatement.executeUpdate(); 
+                    }
+                } else {
+                    System.out.println("Invalid user email");
+                }
+                resultSet.close();
+            } else {
+                System.out.println("Invalid user input: Make sure no values are empty");
+            }
+        }
+        catch(SQLException Ex) {
+            System.out.println("Error running the sample queries.  Machine Error: " +
+                       Ex.toString());
+        } 
+        finally{
+            try {
+                if (statement != null) statement.close();
+                if (prepStatement != null) prepStatement.close();
+            } catch (SQLException e) {
+                System.out.println("Cannot close Statement. Machine error: "+e.toString());
+            }
+        }
     }
 
     public void searchForUser(){
