@@ -9,10 +9,6 @@ DROP TABLE groupMembership CASCADE CONSTRAINTS;
 DROP TABLE messages CASCADE CONSTRAINTS;
 DROP TABLE groupMessageRecipients CASCADE CONSTRAINTS;
 
-DROP SEQUENCE seq_usersID;
-DROP SEQUENCE seq_groupID;
-DROP SEQUENCE seq_msgID;
-
 purge recyclebin;
 
 --Assuming that all users data is necessary (name, email, etc.)
@@ -28,9 +24,6 @@ CREATE TABLE users
     CONSTRAINT users_email UNIQUE (email)
     --an email can only be registered under one user
 );
---Allows new users to be added without needing to know the next available usersID
---to use: call seq_userID.nextval
-CREATE SEQUENCE seq_usersID START WITH 1 INCREMENT BY 1;
 
 CREATE TABLE friends
 (
@@ -62,7 +55,6 @@ CREATE TABLE groupInfo
     CONSTRAINT group_pk PRIMARY KEY (groupID),
     CONSTRAINT group_name UNIQUE (name)
 );
-CREATE SEQUENCE seq_groupID START WITH 1 INCREMENT BY 1;
 
 CREATE TABLE groupMembership
 (
@@ -89,10 +81,9 @@ CREATE TABLE messages
     dateSent DATE NOT NULL,
     CONSTRAINT msg_pk PRIMARY KEY (msgID),
     CONSTRAINT msg_fk1 FOREIGN KEY (senderID) REFERENCES users(userID),
-    CONSTRAINT msg_check CHECK (recipientID IS NOT NULL OR toGroupID IS NOT NULL)
+    CONSTRAINT msg_check CHECK ((recipientID IS NOT NULL AND toGroupID IS NULL) OR (toGroupID IS NOT NULL AND recipientID IS NULL))
     --check to make sure there is a recipient or group to receive message
 );
-CREATE SEQUENCE seq_msgID START WITH 1 INCREMENT BY 1;
 
 --used to see who recieved a message sent to a group
 --this way members that join later are not marked as seeing a message
