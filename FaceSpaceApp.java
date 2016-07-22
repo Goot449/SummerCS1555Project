@@ -39,7 +39,10 @@ public class FaceSpaceApp {
                     createUser(fname, lname, email, dob);
                 }
                 else if(command == 2){
-                    initiateFriendship();
+                    String requestEmail = "jimjohn@gmail.com";
+                    String toEmail = "jed@gmail.com";
+                
+                    initiateFriendship(requestEmail, toEmail);
                 }
                 else if(command == 3){
                     establishFriendShip();
@@ -115,15 +118,17 @@ public class FaceSpaceApp {
                 ids++;
 
                 // create insert query and fill in user fields
-                query = "insert into users values (?,?,?,?, TO_DATE(?, 'mm/dd/yyyy'), NULL)";
+                query = "insert into users values (?,?,?,?, TO_DATE(?, 'mm/dd/yyyy'), ?)";
                 prepStatement = connection.prepareStatement(query);
                 prepStatement.setLong(1, ids);
                 prepStatement.setString(2, fname);
                 prepStatement.setString(3, lname);
                 prepStatement.setString(4, email);
                 prepStatement.setString(5, dob);
-                //prepStatement.setTimestamp(6, java.sql.Timestamp.valueOf(java.time.LocalDateTime.now()));
-
+                java.util.Date time = new java.util.Date();
+                Timestamp current = new Timestamp(time.getTime());
+                prepStatement.setTimestamp(6, current);
+                
                 // run insert and notify user of success
                 prepStatement.executeUpdate();
                 resultSet.close();
@@ -149,8 +154,67 @@ public class FaceSpaceApp {
         }
     }
 
-    public void initiateFriendship(){
+    public void initiateFriendship(String requestEmail, String toEmail){
+        try{
+            long requestID = 0;
+            long toID = 0;
+            
+            // checks for valid user data
+            if( !requestEmail.isEmpty() && !toEmail.isEmpty() )
+            {
+                // query requester's ID
+                statement = connection.createStatement();
+                String selectQuery = "SELECT userID FROM users WHERE email = " + requestEmail; 
+                resultSet = statement.executeQuery(selectQuery);
+                resultSet.next();
+                requestID = resultSet.getLong("userID");
 
+                if( requestID != 0 ) {
+                    // query requester's ID
+                    selectQuery = "SELECT userID FROM users WHERE email = " + toEmail; 
+                    resultSet = statement.executeQuery(selectQuery);
+                    resultSet.next();
+                    toID = resultSet.getLong("userID");
+                    
+                    if( toID != 0 ) {
+                        // create insert query and fill in user fields
+                        query = "insert into pendingFriends values (?,?)";
+                        prepStatement = connection.prepareStatement(query);
+                        prepStatement.setLong(1, requestID); 
+                        prepStatement.setLong(2, toID);
+                        prepStatement.executeUpdate();
+                        
+                        query = "UPDATE users SET lastLogin=? WHERE email = " + requestEmail;
+                        prepStatement = connection.prepareStatement(query);
+                        java.util.Date date= new java.util.Date();
+                        Timestamp current = new Timestamp(date.getTime());
+                        prepStatement.setTimestamp(1, current);
+                        prepStatement.executeUpdate();                 
+                        
+                        System.out.println("Friend Request Sent!");
+                    } else {
+                        System.out.println("Not a valid email to send friend request to");
+                    }
+                } else {
+                    System.out.println("Not a valid email from requester");
+                }
+                resultSet.close();
+            } else {
+                System.out.println("Invalid user input: Make sure no values are empty and user emails exist");
+            }
+        }
+        catch(SQLException Ex) {
+            System.out.println("Error running the sample queries.  Machine Error: " +
+                       Ex.toString());
+        } 
+        finally{
+            try {
+                if (statement != null) statement.close();
+                if (prepStatement != null) prepStatement.close();
+            } catch (SQLException e) {
+                System.out.println("Cannot close Statement. Machine error: "+e.toString());
+            }
+        }
     }
 
     public void establishFriendShip(){
