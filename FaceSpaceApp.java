@@ -39,8 +39,8 @@ public class FaceSpaceApp {
                     createUser(fname, lname, email, dob);
                 }
                 else if(command == 2){
-                    String requestEmail = "jimjohn@gmail.com";
-                    String toEmail = "jed@gmail.com";
+                    String requestEmail = "";
+                    String toEmail = "";
                 
                     initiateFriendship(requestEmail, toEmail);
                 }
@@ -163,19 +163,22 @@ public class FaceSpaceApp {
             if( !requestEmail.isEmpty() && !toEmail.isEmpty() )
             {
                 // query requester's ID
-                statement = connection.createStatement();
-                String selectQuery = "SELECT userID FROM users WHERE email = " + requestEmail; 
-                resultSet = statement.executeQuery(selectQuery);
+                String selectQuery = "SELECT userID FROM users WHERE email = ?"; 
+                prepStatement = connection.prepareStatement(selectQuery);
+                prepStatement.setString(1, requestEmail);
+                resultSet = prepStatement.executeQuery();
                 resultSet.next();
                 requestID = resultSet.getLong("userID");
 
                 if( requestID != 0 ) {
                     // query requester's ID
-                    selectQuery = "SELECT userID FROM users WHERE email = " + toEmail; 
-                    resultSet = statement.executeQuery(selectQuery);
+                    selectQuery = "SELECT userID FROM users WHERE email = ?"; 
+                    prepStatement = connection.prepareStatement(selectQuery);
+                    prepStatement.setString(1, toEmail);
+                    resultSet = prepStatement.executeQuery();
                     resultSet.next();
                     toID = resultSet.getLong("userID");
-                    
+
                     if( toID != 0 ) {
                         // create insert query and fill in user fields
                         query = "insert into pendingFriends values (?,?)";
@@ -184,11 +187,12 @@ public class FaceSpaceApp {
                         prepStatement.setLong(2, toID);
                         prepStatement.executeUpdate();
                         
-                        query = "UPDATE users SET lastLogin=? WHERE email = " + requestEmail;
+                        query = "UPDATE users SET lastLogin=? WHERE email = ?";
                         prepStatement = connection.prepareStatement(query);
                         java.util.Date date= new java.util.Date();
                         Timestamp current = new Timestamp(date.getTime());
                         prepStatement.setTimestamp(1, current);
+                        prepStatement.setString(2, requestEmail);
                         prepStatement.executeUpdate();                 
                         
                         System.out.println("Friend Request Sent!");
