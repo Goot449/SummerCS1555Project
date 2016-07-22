@@ -11,72 +11,84 @@ public class FaceSpaceApp {
     private String query;  //this will hold the query we are using
     static Scanner scanner = new Scanner(System.in); //used to read user input
 
-    public FaceSpaceApp(){
+    public FaceSpaceApp(String mode){
         System.out.println("\n"+"Welcome to FaceSpace!");
+        //user mode
         //This is where the main app will interface with the user to call the different methods
-        int command;
-        while(true){
-            System.out.print("\n"+"Please Enter a Command:"+"\n"+
-                "0 - Quit"+"\n"+"1 - createUser"+"\n"+"2 - initiateFriendship"+"\n"+"3 - establishFriendShip"+"\n"+
-                "4 - displayFriends"+"\n"+"5 - createGroup"+"\n"+"6 - addToGroup"+"\n"+"7 - sendMessageToUser"+"\n"+
-                "8 - sendMessageToGroup"+"\n"+"9 - displayMessages"+"\n"+"10 - displayNewMessages"+"\n"+
-                "11 - searchForUser"+"\n"+"12 - threeDegrees"+"\n"+"13 - topMessagers"+"\n"+"14 - dropUser"+"\n"+"Command: ");
-            command = Integer.parseInt(scanner.next());
+        if(mode.equalsIgnoreCase("user")){
+            System.out.println("FaceSpaceApp is now in USER MODE");
+            int command;
+            while(true){
+                System.out.print("\n"+"Please Enter a Command:"+"\n"+
+                    "0 - Quit"+"\n"+"1 - createUser"+"\n"+"2 - initiateFriendship"+"\n"+"3 - establishFriendShip"+"\n"+
+                    "4 - displayFriends"+"\n"+"5 - createGroup"+"\n"+"6 - addToGroup"+"\n"+"7 - sendMessageToUser"+"\n"+
+                    "8 - sendMessageToGroup"+"\n"+"9 - displayMessages"+"\n"+"10 - displayNewMessages"+"\n"+
+                    "11 - searchForUser"+"\n"+"12 - threeDegrees"+"\n"+"13 - topMessagers"+"\n"+"14 - dropUser"+"\n"+"Command: ");
+                command = Integer.parseInt(scanner.next());
 
-            if(command == 0){
-                System.out.println("Logging Out");
-                break;
+                if(command == 0){
+                    System.out.println("Logging Out");
+                    break;
+                }
+                else if(command == 1){
+                    String fname = "";
+                    String lname = "";
+                    String email = "";
+                    String dob = "";
+
+                    createUser(fname, lname, email, dob);
+                }
+                else if(command == 2){
+                    initiateFriendship();
+                }
+                else if(command == 3){
+                    establishFriendShip();
+                }
+                else if(command == 4){
+                    displayFriends();
+                }
+                else if(command == 5){
+                    createGroup();
+                }
+                else if(command == 6){
+                    addToGroup();
+                }
+                else if(command == 7){
+                    sendMessageToUser();
+                }
+                else if(command == 8){
+                    sendMessageToGroup();
+                }
+                else if(command == 9){
+                    displayMessages();
+                }
+                else if(command == 10){
+                    displayNewMessages();
+                }
+                else if(command == 11){
+                    searchForUser();
+                }
+                else if(command == 12){
+                    threeDegrees();
+                }
+                else if(command == 13){
+                    topMessagers();
+                }
+                else if(command == 14){
+                    dropUser();
+                }
+                else{
+                    System.out.println("Command Not Recognized!");
+                }
             }
-            else if(command == 1){
-                String fname = "";
-                String lname = "";
-                String email = "";
-                String dob = "";
-                
-                createUser(fname, lname, email, dob);
-            }
-            else if(command == 2){
-                initiateFriendship();
-            }
-            else if(command == 3){
-                establishFriendShip();
-            }
-            else if(command == 4){
-                displayFriends();
-            }
-            else if(command == 5){
-                createGroup();
-            }
-            else if(command == 6){
-                addToGroup();
-            }
-            else if(command == 7){
-                sendMessageToUser();
-            }
-            else if(command == 8){
-                sendMessageToGroup();
-            }
-            else if(command == 9){
-                displayMessages();
-            }
-            else if(command == 10){
-                displayNewMessages();
-            }
-            else if(command == 11){
-                searchForUser();
-            }
-            else if(command == 12){
-                threeDegrees();
-            }
-            else if(command == 13){
-                topMessagers();
-            }
-            else if(command == 14){
-                dropUser();
-            }
-            else{
-                System.out.println("Command Not Recognized!");
-            }
+        }
+        else if(mode.equalsIgnoreCase("driver")){
+            //driver mode
+            System.out.println("FaceSpaceApp is now in DRIVER MODE");
+            //testDriver Class is now executing its tests
+        }
+        else{
+            System.out.println("Mode Not Recognized <User/Driver>");
         }
     }
 
@@ -96,21 +108,21 @@ public class FaceSpaceApp {
             {
                 // query number of users to increment to next user id
                 statement = connection.createStatement();
-                String selectQuery = "SELECT COUNT(*) AS total FROM users"; 
+                String selectQuery = "SELECT COUNT(*) AS total FROM users";
                 resultSet = statement.executeQuery(selectQuery);
                 resultSet.next();
                 int ids = resultSet.getInt("total");
                 ids++;
-                
+
                 // create insert query and fill in user fields
-                query = "insert into users values (?,?,?,?, TO_DATE(?, 'mm/dd/yyyy'), ?)";
+                query = "insert into users values (?,?,?,?, TO_DATE(?, 'mm/dd/yyyy'), NULL)";
                 prepStatement = connection.prepareStatement(query);
-                prepStatement.setLong(1, ids); 
+                prepStatement.setLong(1, ids);
                 prepStatement.setString(2, fname);
                 prepStatement.setString(3, lname);
                 prepStatement.setString(4, email);
                 prepStatement.setString(5, dob);
-                prepStatement.setTimestamp(6, java.sql.Timestamp.valueOf(java.time.LocalDateTime.now()));
+                //prepStatement.setTimestamp(6, java.sql.Timestamp.valueOf(java.time.LocalDateTime.now()));
 
                 // run insert and notify user of success
                 prepStatement.executeUpdate();
@@ -123,7 +135,7 @@ public class FaceSpaceApp {
         catch(SQLException Ex) {
             System.out.println("Error running the sample queries.  Machine Error: " +
                        Ex.toString());
-        } 
+        }
         catch (ParseException ex) {
             System.out.println("Invalid user input: Make sure no values are empty and the date format is mm/dd/yyyy");
         }
@@ -190,6 +202,27 @@ public class FaceSpaceApp {
     }
 
     public static void main(String args[]) throws SQLException {
+        //validate argument and set FaceSpaceApp "mode"
+        String mode;
+        if(args.length == 0){
+            System.out.println("***Invalid Argument***");
+            System.out.print("Please Choose Mode <User/Driver>: ");
+            mode = scanner.next();
+        }
+        else{
+            mode = args[0];
+        }
+        while(true){
+            if(!mode.equalsIgnoreCase("user") && !mode.equalsIgnoreCase("driver")){
+                System.out.println("***Invalid Mode***");
+                System.out.print("Please Choose Mode <User/Driver>: ");
+                mode = scanner.next();
+            }
+            else{
+                break;
+            }
+        }
+
         //User is prompted for Oracle Username and Password
         String username, password;
         System.out.print("Enter Oracle Username: ");//This is your username in oracle
@@ -198,6 +231,7 @@ public class FaceSpaceApp {
         password = scanner.next();
 
         try{
+            System.out.println("Logging In...");
             // Register the oracle driver.
             DriverManager.registerDriver (new oracle.jdbc.driver.OracleDriver());
             //This is the location of the database
@@ -205,7 +239,12 @@ public class FaceSpaceApp {
             //create a connection to DB on class3.cs.pitt.edu
             connection = DriverManager.getConnection(url, username, password);
 
-            FaceSpaceApp fsa = new FaceSpaceApp();
+            if(mode.equalsIgnoreCase("user")){
+                FaceSpaceApp fsa = new FaceSpaceApp(mode);
+            }
+            else{
+                testDriver testApp = new testDriver();
+            }
         }
         catch(Exception Ex)  {
             System.out.println("Error connecting to database.  Machine Error: " + Ex.toString());
