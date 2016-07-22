@@ -54,10 +54,17 @@ public class FaceSpaceApp {
                     displayFriends();
                 }
                 else if(command == 5){
-                    createGroup();
+                    String name = "";
+                    String description = "";
+                    int memberLimit = 0;
+                    
+                    createGroup(name, description, memberLimit);
                 }
                 else if(command == 6){
-                    addToGroup();
+                    String email = "";
+                    String groupName = "";
+                    
+                    addToGroup(email, groupName);
                 }
                 else if(command == 7){
                     sendMessageToUser();
@@ -243,7 +250,7 @@ public class FaceSpaceApp {
             // checks for valid user data
             if( !user1Email.isEmpty() && !user2Email.isEmpty() ){
 
-            // query user1's ID
+                // query user1's ID
                 String selectQuery = "SELECT userID FROM users WHERE email = ?"; 
                 prepStatement = connection.prepareStatement(selectQuery);
                 prepStatement.setString(1, user1Email);
@@ -325,12 +332,118 @@ public class FaceSpaceApp {
 
     }
 
-    public void createGroup(){
-
+    public void createGroup(String name, String description, int memberLimit){
+        try{            
+            // checks for valid user data
+            if( !name.isEmpty() && memberLimit > 0 ){
+                // query number of groups to increment to next user id
+                statement = connection.createStatement();
+                String selectQuery = "SELECT COUNT(*) AS total FROM groupInfo";
+                resultSet = statement.executeQuery(selectQuery);
+                resultSet.next();
+                int ids = resultSet.getInt("total");
+                ids++;
+            
+                // create insert query and fill in user fields
+                query = "insert into groupInfo values (?,?,?,?)";
+                prepStatement = connection.prepareStatement(query);
+                prepStatement.setLong(1, ids);
+                prepStatement.setString(2, name);
+                prepStatement.setString(3, description);
+                prepStatement.setInt(4, memberLimit);
+                
+                // run insert and notify user of success
+                prepStatement.executeUpdate();
+                System.out.println("Group Created!");
+                resultSet.close();
+            } else {
+                System.out.println("Invalid user input: Make sure no values are empty and Member limit is greater than 0");
+            }
+        }
+        catch(SQLException Ex) {
+            System.out.println("Error running the sample queries.  Machine Error: " +
+                       Ex.toString());
+        } 
+        finally{
+            try {
+                if (statement != null) statement.close();
+                if (prepStatement != null) prepStatement.close();
+            } catch (SQLException e) {
+                System.out.println("Cannot close Statement. Machine error: "+e.toString());
+            }
+        }
     }
 
-    public void addToGroup(){
+    public void addToGroup(String email, String groupName){
+        try{            
+            long userID;
+            long groupID;
+            int memberLimit;
+            
+            // checks for valid user data
+            if( !email.isEmpty() && !groupName.isEmpty() ){
+                
+                // query user's ID
+                String selectQuery = "SELECT userID FROM users WHERE email = ?"; 
+                prepStatement = connection.prepareStatement(selectQuery);
+                prepStatement.setString(1, email);
+                resultSet = prepStatement.executeQuery();
+                if(resultSet.next()){
+                    userID = resultSet.getLong("userID");
+                
+                    // query group's ID
+                    selectQuery = "SELECT groupID, memberLimit FROM groupInfo WHERE name = ?"; 
+                    prepStatement = connection.prepareStatement(selectQuery);
+                    prepStatement.setString(1, groupName);
+                    resultSet = prepStatement.executeQuery();
+                    if(resultSet.next()){
+                        groupID = resultSet.getLong("groupID");
+                        memberLimit = resultSet.getInt("memberLimit");
+                        
+                        // query group's member size
+                        selectQuery = "SELECT COUNT(*) AS total FROM groupMembership WHERE groupID = ?"; 
+                        prepStatement = connection.prepareStatement(selectQuery);
+                        prepStatement.setLong(1, groupID);
+                        resultSet = prepStatement.executeQuery();
+                        resultSet.next();
+                        int size = resultSet.getInt("total");
+                            
+                        if( size < memberLimit ){
+                            // create insert query and fill in 
+                            query = "insert into groupMembership values (?,?)";
+                            prepStatement = connection.prepareStatement(query);
+                            prepStatement.setLong(1, groupID);
+                            prepStatement.setLong(2, userID);
 
+                            // run insert and notify user of success
+                            prepStatement.executeUpdate();
+                            System.out.println("Group Member Added!");
+                        } else {
+                            System.out.println("The group is full");
+                        }
+                    } else {
+                        System.out.println("Invalid group name");
+                    }
+                } else {
+                    System.out.println("Invalid user email");
+                }
+                resultSet.close();
+            } else {
+                System.out.println("Invalid user input: Make sure no values are empty");
+            }
+        }
+        catch(SQLException Ex) {
+            System.out.println("Error running the sample queries.  Machine Error: " +
+                       Ex.toString());
+        } 
+        finally{
+            try {
+                if (statement != null) statement.close();
+                if (prepStatement != null) prepStatement.close();
+            } catch (SQLException e) {
+                System.out.println("Cannot close Statement. Machine error: "+e.toString());
+            }
+        }
     }
 
     public void sendMessageToUser(){

@@ -59,16 +59,16 @@ CREATE TABLE groupInfo
     name VARCHAR2(50) NOT NULL,
     description VARCHAR2(255),
     memberLimit NUMBER(5) NOT NULL,
-    CONSTRAINT group_pk PRIMARY KEY (groupID)
+    CONSTRAINT group_pk PRIMARY KEY (groupID),
+    CONSTRAINT group_name UNIQUE (name)
 );
 CREATE SEQUENCE seq_groupID START WITH 1 INCREMENT BY 1;
 
 CREATE TABLE groupMembership
 (
-    membershipID NUMBER(10) NOT NULL,
     groupID NUMBER(10) NOT NULL,
     userID NUMBER(10) NOT NULL,
-    CONSTRAINT groupMembership_pk PRIMARY KEY (membershipID),
+    CONSTRAINT groupMembership_pk PRIMARY KEY (groupID, userID),
     CONSTRAINT groupMembership_fk1 FOREIGN KEY (groupID) REFERENCES groupInfo(groupID),
     CONSTRAINT groupMembership_fk2 FOREIGN KEY (userID) REFERENCES users(userID)
 );
@@ -442,47 +442,47 @@ INSERT INTO groupInfo VALUES (10, 'Golf', 'For golf players', 50);
 --add members to the groups
 --membershipID,groupID,userID
 --only users 1-13 are currently in groups for simplicity
-INSERT INTO groupMembership VALUES (1 ,1,1 );
-INSERT INTO groupMembership VALUES (2 ,1,2 );
-INSERT INTO groupMembership VALUES (3 ,1,3 );
-INSERT INTO groupMembership VALUES (4 ,2,4 );
-INSERT INTO groupMembership VALUES (5 ,2,5 );
-INSERT INTO groupMembership VALUES (6 ,2,6 );
-INSERT INTO groupMembership VALUES (7 ,2,7 );
-INSERT INTO groupMembership VALUES (8 ,2,8 );
-INSERT INTO groupMembership VALUES (9 ,3,9 );
-INSERT INTO groupMembership VALUES (10,3,10);
-INSERT INTO groupMembership VALUES (11,3,11);
-INSERT INTO groupMembership VALUES (12,4,1 );
-INSERT INTO groupMembership VALUES (13,4,2 );
-INSERT INTO groupMembership VALUES (14,4,3 );
-INSERT INTO groupMembership VALUES (15,4,4 );
-INSERT INTO groupMembership VALUES (16,5,5 );
-INSERT INTO groupMembership VALUES (17,5,6 );
-INSERT INTO groupMembership VALUES (18,5,7 );
-INSERT INTO groupMembership VALUES (19,6,8 );
-INSERT INTO groupMembership VALUES (20,6,9 );
-INSERT INTO groupMembership VALUES (21,6,10);
-INSERT INTO groupMembership VALUES (22,6,11);
-INSERT INTO groupMembership VALUES (23,6,12);
-INSERT INTO groupMembership VALUES (24,6,13);
-INSERT INTO groupMembership VALUES (25,7,1 );
-INSERT INTO groupMembership VALUES (26,7,2 );
-INSERT INTO groupMembership VALUES (27,7,3 );
-INSERT INTO groupMembership VALUES (28,8,4 );
-INSERT INTO groupMembership VALUES (29,8,5 );
-INSERT INTO groupMembership VALUES (30,8,6 );
-INSERT INTO groupMembership VALUES (31,8,7 );
-INSERT INTO groupMembership VALUES (32,8,8 );
-INSERT INTO groupMembership VALUES (33,8,9 );
-INSERT INTO groupMembership VALUES (34,9,10);
-INSERT INTO groupMembership VALUES (35,9,11);
-INSERT INTO groupMembership VALUES (36,9,12);
-INSERT INTO groupMembership VALUES (37,9,13);
-INSERT INTO groupMembership VALUES (38,10,1);
-INSERT INTO groupMembership VALUES (39,10,2);
-INSERT INTO groupMembership VALUES (40,10,3);
-INSERT INTO groupMembership VALUES (41,10,4);
+INSERT INTO groupMembership VALUES (1,1 );
+INSERT INTO groupMembership VALUES (1,2 );
+INSERT INTO groupMembership VALUES (1,3 );
+INSERT INTO groupMembership VALUES (2,4 );
+INSERT INTO groupMembership VALUES (2,5 );
+INSERT INTO groupMembership VALUES (2,6 );
+INSERT INTO groupMembership VALUES (2,7 );
+INSERT INTO groupMembership VALUES (2,8 );
+INSERT INTO groupMembership VALUES (3,9 );
+INSERT INTO groupMembership VALUES (3,10);
+INSERT INTO groupMembership VALUES (3,11);
+INSERT INTO groupMembership VALUES (4,1 );
+INSERT INTO groupMembership VALUES (4,2 );
+INSERT INTO groupMembership VALUES (4,3 );
+INSERT INTO groupMembership VALUES (4,4 );
+INSERT INTO groupMembership VALUES (5,5 );
+INSERT INTO groupMembership VALUES (5,6 );
+INSERT INTO groupMembership VALUES (5,7 );
+INSERT INTO groupMembership VALUES (6,8 );
+INSERT INTO groupMembership VALUES (6,9 );
+INSERT INTO groupMembership VALUES (6,10);
+INSERT INTO groupMembership VALUES (6,11);
+INSERT INTO groupMembership VALUES (6,12);
+INSERT INTO groupMembership VALUES (6,13);
+INSERT INTO groupMembership VALUES (7,1 );
+INSERT INTO groupMembership VALUES (7,2 );
+INSERT INTO groupMembership VALUES (7,3 );
+INSERT INTO groupMembership VALUES (8,4 );
+INSERT INTO groupMembership VALUES (8,5 );
+INSERT INTO groupMembership VALUES (8,6 );
+INSERT INTO groupMembership VALUES (8,7 );
+INSERT INTO groupMembership VALUES (8,8 );
+INSERT INTO groupMembership VALUES (8,9 );
+INSERT INTO groupMembership VALUES (9,10);
+INSERT INTO groupMembership VALUES (9,11);
+INSERT INTO groupMembership VALUES (9,12);
+INSERT INTO groupMembership VALUES (9,13);
+INSERT INTO groupMembership VALUES (10,1);
+INSERT INTO groupMembership VALUES (10,2);
+INSERT INTO groupMembership VALUES (10,3);
+INSERT INTO groupMembership VALUES (10,4);
 
 --generate 300 messages
 --messages sent to a group only come from a member in the group
