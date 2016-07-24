@@ -32,84 +32,134 @@ public class FaceSpaceApp {
                     break;
                 }
                 else if(command == 1){
-                    String fname = "";
-                    String lname = "";
-                    String email = "";
-                    String dob = "";
+                    System.out.println("**Create New User**");
+                    System.out.print("Enter New User's First Name: ");
+                    String fname = scanner.next();
+                    System.out.print("Enter New User's Last Name: ");
+                    String lname = scanner.next();
+                    System.out.print("Enter New User's Email: ");
+                    String email = scanner.next();
+                    System.out.print("Enter New User's Date Of Birth (mm/dd/yyyy): ");
+                    String dob = scanner.next();
 
                     createUser(fname, lname, email, dob);
                 }
                 else if(command == 2){
-                    String requestEmail = "";
-                    String toEmail = "";
+                    System.out.println("**Initiate Friendship**");
+                    System.out.print("Enter User's Email Who's Requesting Friendship: ");
+                    String requestEmail = scanner.next();
+                    System.out.print("Enter User's Email Who's Recieving Request: ");
+                    String toEmail = scanner.next();
 
                     initiateFriendship(requestEmail, toEmail);
                 }
                 else if(command == 3){
-                    String user1Email = "";
-                    String user2Email = "";
+                    System.out.println("**Establish Friendship**");
+                    System.out.print("Enter User1's Email: ");
+                    String user1Email = scanner.next();
+                    System.out.print("Enter User2's Email: ");
+                    String user2Email = scanner.next();
 
                     establishFriendship(user1Email, user2Email);
                 }
                 else if(command == 4){
-                    System.out.print("Please Enter Users Email: ");
+                    System.out.println("**Display Friends**");
+                    System.out.print("Enter Users Email: ");
                     String email = scanner.next();
 
                     displayFriends(email);
                 }
                 else if(command == 5){
-                    String name = "";
-                    String description = "";
-                    int memberLimit = 0;
+                    System.out.println("**Create Group**");
+                    System.out.print("Enter Group Name: ");
+                    String name = scanner.next();
+                    System.out.print("Enter Group Description: ");
+                    String description = scanner.next();
+                    System.out.println("Set Member Limit: ");
+                    int memberLimit = Integer.parseInt(scanner.next());
 
                     createGroup(name, description, memberLimit);
                 }
                 else if(command == 6){
-                    String email = "";
-                    String groupName = "";
+                    System.out.println("**Add Member To Group**");
+                    System.out.println("Enter New Member's Email: ");
+                    String email = scanner.next();
+                    System.out.println("Enter Group Name: ");
+                    String groupName = scanner.next();
 
                     addToGroup(email, groupName);
                 }
                 else if(command == 7){
-                    String subject = "";
-                    String body = "";
-                    String recipientEmail = "";
-                    String senderEmail = "";
+                    System.out.println("**Send Message To User**");
+                    System.out.println("Enter Message's Subject: ");
+                    String subject = scanner.next();
+                    System.out.println("Enter Message's Body Text: ");
+                    String body = scanner.next();
+                    System.out.println("Enter Recipients Email: ");
+                    String recipientEmail = scanner.next();
+                    System.out.println("Enter Sender's Email: ");
+                    String senderEmail = scanner.next();
 
                     sendMessageToUser(subject, body, recipientEmail, senderEmail);
                 }
                 else if(command == 8){
-                    String subject = "";
-                    String body = "";
-                    String groupName = "";
-                    String senderEmail = "";
+                    System.out.println("**Send Message To Group**");
+                    System.out.println("Enter Message's Subject: ");
+                    String subject = scanner.next();
+                    System.out.println("Enter Message's Body Text: ");
+                    String body = scanner.next();
+                    System.out.println("Enter Group Name: ");
+                    String groupName = scanner.next();
+                    System.out.println("Enter Sender's Email: ");
+                    String senderEmail = scanner.next();
 
                     sendMessageToGroup(subject, body, groupName, senderEmail);
                 }
                 else if(command == 9){
-                    String userEmail = "";
+                    System.out.println("**Display Messages**");
+                    System.out.println("Enter User's Email: ");
+                    String userEmail = scanner.next();
 
                     displayMessages(userEmail);
                 }
                 else if(command == 10){
-                    String userEmail = "";
+                    System.out.println("**Display New Messages**");
+                    System.out.println("Enter User's Email: ");
+                    String userEmail = scanner.next();
 
                     displayNewMessages(userEmail);
                 }
                 else if(command == 11){
-                    searchForUser();
+                    System.out.println("**Search For User**");
+                    System.out.println("Enter Search: ");
+                    String search = scanner.next();
+
+                    searchForUser(search);
                 }
                 else if(command == 12){
-                    String emailA = "jimjohn@gmail.com";
-                    String emailB = "sturner@gmail.com";
+                    System.out.println("**Three Degrees**");
+                    System.out.print("Enter User1's Email: ");
+                    String emailA = scanner.next();
+                    System.out.print("Enter User2's Email: ");
+                    String emailB = scanner.next();
 
                     threeDegrees(emailA, emailB);
                 }
                 else if(command == 13){
-                    topMessagers();
+                    System.out.println("**Top Messagers**");
+                    System.out.print("Enter Number of Top X Messagers: ");
+                    int numMessagers = Integer.parseInt(scanner.next());
+                    System.out.print("Enter Number of Months: ");
+                    int numMonths = Integer.parseInt(scanner.next());
+
+                    topMessagers(numMessagers, numMonths);
                 }
                 else if(command == 14){
-                    dropUser();
+                    System.out.println("**Drop User**");
+                    System.out.print("Enter User's Email: ");
+                    String userEmail = scanner.next();
+
+                    dropUser(userEmail);
                 }
                 else{
                     System.out.println("Command Not Recognized!");
@@ -891,7 +941,7 @@ public class FaceSpaceApp {
         }
     }
 
-    public void searchForUser(){
+    public void searchForUser(String search){
 
     }
 
@@ -1022,11 +1072,11 @@ public class FaceSpaceApp {
         }
     }
 
-    public void topMessagers(){
+    public void topMessagers(int numMessagers, int numMonths){
 
     }
 
-    public void dropUser(){
+    public void dropUser(String userEmail){
 
     }
 
