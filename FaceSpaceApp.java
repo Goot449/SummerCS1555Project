@@ -100,8 +100,8 @@ public class FaceSpaceApp {
                     searchForUser();
                 }
                 else if(command == 12){
-                    String emailA = "";
-                    String emailB = "";
+                    String emailA = "jimjohn@gmail.com";
+                    String emailB = "sturner@gmail.com";
 
                     threeDegrees(emailA, emailB);
                 }
@@ -757,7 +757,7 @@ public class FaceSpaceApp {
                     prepStatement = connection.prepareStatement(selectQuery);
                     prepStatement.setLong(1, userID);
                     resultSet = prepStatement.executeQuery();
-                    Stack resultStack = new Stack();
+                    Stack<Long> resultStack = new Stack<Long>();
                     while(resultSet.next()){
                         long messageID = resultSet.getLong("msgID");
                         resultStack.push(new Long(messageID));
@@ -841,7 +841,7 @@ public class FaceSpaceApp {
                         prepStatement = connection.prepareStatement(selectQuery);
                         prepStatement.setLong(1, userID);
                         resultSet = prepStatement.executeQuery();
-                        Stack resultStack = new Stack();
+                        Stack<Long> resultStack = new Stack<Long>();
                         while(resultSet.next()){
                             long messageID = resultSet.getLong("msgID");
                             resultStack.push(new Long(messageID));
@@ -923,7 +923,7 @@ public class FaceSpaceApp {
                         prepStatement = connection.prepareStatement(selectQuery);
                         prepStatement.setLong(1, AID);
                         resultSet = prepStatement.executeQuery();
-                        Stack hop1Stack = new Stack();
+                        Stack<Long> hop1Stack = new Stack<Long>();
                         while(resultSet.next()){
                             long messageID = resultSet.getLong("userID2");
                             hop1Stack.push(new Long(messageID));
@@ -947,7 +947,7 @@ public class FaceSpaceApp {
                                 prepStatement = connection.prepareStatement(selectQuery);
                                 prepStatement.setLong(1, hop1ID);
                                 resultSet = prepStatement.executeQuery();
-                                Stack hop2Stack = new Stack();
+                                Stack<Long> hop2Stack = new Stack<Long>();
                                 while(resultSet.next()){
                                     long friend2ID = resultSet.getLong("userID2");
                                     if(friend2ID != AID){
@@ -973,7 +973,7 @@ public class FaceSpaceApp {
                                         prepStatement = connection.prepareStatement(selectQuery);
                                         prepStatement.setLong(1, hop2ID);
                                         resultSet = prepStatement.executeQuery();
-                                        Stack hop3Stack = new Stack();
+                                        Stack<Long> hop3Stack = new Stack<Long>();
                                         while(resultSet.next()){
                                             long friend3ID = resultSet.getLong("userID2");
                                             hop3Stack.push(new Long(friend3ID));
