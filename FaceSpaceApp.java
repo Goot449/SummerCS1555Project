@@ -1131,7 +1131,90 @@ public class FaceSpaceApp {
     }
 
     public void topMessagers(int numMessagers, int numMonths){
+        try {
+            if (numMonths > 0) {
+                ResultSet resultSetCount;
+                //ResultSet resultSetCount2;
+                int tempMsgID;
+                int tempID;
+                //get Date and timestamp of numMonths ago
+                java.util.Date date = new java.util.Date();
+                Calendar c = Calendar.getInstance();
+                c.setTime(date);
+                c.add(Calendar.MONTH, -numMonths);
+                System.out.println(c.getTime());
+                date = c.getTime();
+                java.sql.Date sqlReferenceDate = new java.sql.Date(date.getTime());
 
+                //find num of users and create array accordingly
+                statement = connection.createStatement();
+                String selectQuery = "SELECT COUNT(*) AS total FROM users";
+                resultSet = statement.executeQuery(selectQuery);
+                resultSet.next();
+                int numUsers = resultSet.getInt("total");
+                numUsers++;
+                int[] countArray = new int[numUsers];
+
+                selectQuery = "SELECT msgID FROM messages WHERE (dateSent >= ?)";
+                prepStatement = connection.prepareStatement(selectQuery);
+                prepStatement.setDate(1, sqlReferenceDate);
+                resultSet = prepStatement.executeQuery();
+                while(resultSet.next()){
+                    tempMsgID = resultSet.getInt("msgID");
+
+                    selectQuery = "SELECT senderID,recipientID FROM messages, WHERE msgID = ?";
+                    prepStatement = connection.prepareStatement(selectQuery);
+                    prepStatement.setInt(1, tempMsgID);
+                    resultSetCount = prepStatement.executeQuery();
+
+                    //count all senders and recipients of single messages
+                    while(resultSetCount.next()){
+                        tempID = resultSetCount.getInt("senderID");
+                        countArray[tempID]++;
+                        tempID = resultSetCount.getInt("recipientID");
+                        //when recipientID is null and returns O
+                        if(tempID > 0){
+                            countArray[tempID]++;
+                        }
+                    }
+                    //resultSetCount.close();
+                    //count all recipients from group messages
+                    /*selectQuery = "SELECT recipientID FROM groupMessageRecipients WHERE msgID = ?";
+                    prepStatement = connection.prepareStatement(selectQuery);
+                    prepStatement.setInt(1, tempMsgID);
+                    resultSetCount = prepStatement.executeQuery();*/
+                    //count all senders and recipients of single messages
+                    /*while(resultSetCount.next()){
+                        tempID = resultSetCount.getInt("recipientID");
+                        countArray[tempID]++;
+                    }*/
+                }
+                for(int i=0; i<numUsers; i++){
+                    System.out.print("All users total number of sent and recieved messages");
+                    System.out.println(countArray[i]);
+                }
+                /*System.out.println("test");
+                System.out.println(countArray[0]);
+                System.out.println(countArray[1]);
+                System.out.println(countArray[101]);*/
+
+            }
+            else {
+                System.out.println("Invalid Value for Number of Months");
+            }
+        }
+        catch(SQLException Ex) {
+            System.out.println("Error running the sample queries.  Machine Error: " +
+                       Ex.toString());
+        }
+        finally{
+            try {
+                if (statement != null) statement.close();
+                if (prepStatement != null) prepStatement.close();
+            } catch (SQLException e) {
+                System.out.println("Cannot close Statement. Machine error: "+e.toString());
+            }
+        }
     }
 
     public void dropUser(String userEmail){
