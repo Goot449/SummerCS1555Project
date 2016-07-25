@@ -1135,6 +1135,37 @@ public class FaceSpaceApp {
     }
 
     public void dropUser(String userEmail){
+        try{
+            //do not search if term is empty
+            if (userEmail.length()>1) {
+                String[] terms = search.split(" ");
+
+                selectQuery = selectQuery + "DELETE FROM users WHERE email=?";
+                String email = user;
+                prepStatement.setString(1,userEmail);
+
+                resultSetEmail = prepStatement.executeQuery();
+                //queue up the next name
+                while(resultSetSearch.next()){
+                    //print name to screen
+                    System.out.println("User Deleted");
+                }
+            }else{
+                System.out.println("No search term entered.");
+            }
+        }
+        catch(SQLException Ex) {
+            System.out.println("Error running the sample queries.  Machine Error: " +
+                    Ex.toString());
+        }
+        finally{
+            try {
+                if (statement != null) statement.close();
+                if (prepStatement != null) prepStatement.close();
+            } catch (SQLException e) {
+                System.out.println("Cannot close Statement. Machine error: "+e.toString());
+            }
+        }
 
     }
 
