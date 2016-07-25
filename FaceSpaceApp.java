@@ -943,6 +943,58 @@ public class FaceSpaceApp {
 
     public void searchForUser(String search){
 
+
+        try{
+            String[] terms = search.split(" ");
+            long userID;
+            long friendUserID;
+            ResultSet resultSet2;
+            ResultSet resultSetSearch;
+            // checks for valid user data
+            int i=0;
+            int j=1;
+            String selectQuery="";
+            //Build Query
+            for(String s : terms ) {
+                i++;
+                if (i > 1) {
+                    selectQuery = selectQuery + " UNION ";
+                }
+                selectQuery = selectQuery + "SELECT DISTINCT fname,lname FROM users WHERE (fname LIKE ? OR lname LIKE ? OR email LIKE ?)";
+            }
+            //Prepare Statement
+            prepStatement = connection.prepareStatement(selectQuery);
+            //Bind terms to statement
+            for(String s : terms ) {
+
+                String fname = s;
+                String lname = s;
+                String email = s;
+                prepStatement.setString(j, '%'+fname+'%');
+                prepStatement.setString(j+1, '%'+lname+'%');
+                prepStatement.setString(j+2, '%'+email+'%');
+                j=j+3;
+            }
+            resultSetSearch = prepStatement.executeQuery();
+            //queue up the next name
+            while(resultSetSearch.next()){
+                //print name to screen
+                System.out.println(resultSetSearch.getString("fname") + " " + resultSetSearch.getString("lname"));
+            }
+        }
+        catch(SQLException Ex) {
+            System.out.println("Error running the sample queries.  Machine Error: " +
+                    Ex.toString());
+        }
+        finally{
+            try {
+                if (statement != null) statement.close();
+                if (prepStatement != null) prepStatement.close();
+            } catch (SQLException e) {
+                System.out.println("Cannot close Statement. Machine error: "+e.toString());
+            }
+        }
+
     }
 
     public void threeDegrees(String emailA, String emailB){
