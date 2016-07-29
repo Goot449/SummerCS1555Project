@@ -3,6 +3,14 @@ import java.text.ParseException;
 import java.util.Scanner;
 import java.text.SimpleDateFormat;
 import java.util.Stack;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.Comparator;
+import java.util.Map.Entry;
+import java.util.Collections;
 
 public class FaceSpaceApp {
     private static Connection connection; //used to hold the jdbc connection to the DB
@@ -492,10 +500,12 @@ public class FaceSpaceApp {
                 else{
                     System.out.println("Invalid user input: No user exists with the given email");
                 }
+                resultSet.close();
             }
             else{
                 System.out.println("Invalid user input: Make sure to enter the user email");
             }
+            resultSet.close();
         }
         catch(SQLException Ex) {
             System.out.println("Error running the sample queries.  Machine Error: " +
@@ -1003,6 +1013,8 @@ public class FaceSpaceApp {
 
     }
 
+
+
     public void threeDegrees(String emailA, String emailB){
         try{
             long AID = 0;
@@ -1130,21 +1142,31 @@ public class FaceSpaceApp {
         }
     }
 
-    public void topMessagers(int numMessagers, int numMonths){
+     public void topMessagers(int numMessagers, int numMonths){
         try {
             if (numMonths > 0) {
-                ResultSet resultSetCount;
+                //ResultSet resultSetCount;
                 //ResultSet resultSetCount2;
                 int tempMsgID;
                 int tempID;
+                int countTemp;
+                Map <Integer, Integer> countMap = new HashMap<Integer, Integer>();
                 //get Date and timestamp of numMonths ago
                 java.util.Date date = new java.util.Date();
                 Calendar c = Calendar.getInstance();
                 c.setTime(date);
                 c.add(Calendar.MONTH, -numMonths);
-                System.out.println(c.getTime());
                 date = c.getTime();
                 java.sql.Date sqlReferenceDate = new java.sql.Date(date.getTime());
+
+              //  countMap.put(1,0);
+              //  System.out.println("map: " + countMap.get(0));
+              //  System.out.println("map: " + countMap.get(1));
+              // int test =  countMap.get(1);
+              // countMap.put(1,++test);
+              //  System.out.println("map2: " + countMap.get(1));
+              //  countMap.put(1,5);
+              //  System.out.println("map3: " + countMap.get(1));
 
                 //find num of users and create array accordingly
                 statement = connection.createStatement();
@@ -1154,54 +1176,133 @@ public class FaceSpaceApp {
                 int numUsers = resultSet.getInt("total");
                 numUsers++;
                 int[] countArray = new int[numUsers];
+                System.out.println("Total NumUsers: " + (numUsers-1));
 
-                selectQuery = "SELECT msgID FROM messages WHERE (dateSent >= ?)";
+                //find num of messages that are within the specified time range
+                //create msgIDArray with msg count for num messages sent to groups
+                selectQuery = "SELECT COUNT(msgID) AS total FROM messages WHERE (dateSent >= ?) AND (recipientID IS NULL)";
                 prepStatement = connection.prepareStatement(selectQuery);
                 prepStatement.setDate(1, sqlReferenceDate);
                 resultSet = prepStatement.executeQuery();
-                while(resultSet.next()){
-                    tempMsgID = resultSet.getInt("msgID");
+                resultSet.next();
+                int numMsg = resultSet.getInt("total");
+                int[] msgIDArray = new int[numMsg];
+                System.out.println("Total NumGroupMsgs: " + numMsg);
 
-                    selectQuery = "SELECT senderID,recipientID FROM messages, WHERE msgID = ?";
+                //selectQuery = "SELECT msgID FROM messages WHERE (dateSent >= ?) AND (toGroupID IS NULL)";
+                selectQuery = "SELECT msgID FROM messages WHERE (dateSent >= ?) AND (recipientID IS NULL)";
+                prepStatement = connection.prepareStatement(selectQuery);
+                prepStatement.setDate(1, sqlReferenceDate);
+                resultSet = prepStatement.executeQuery();
+
+                //populate msgIDArray with msgIDs sent to groups
+                //used for groupMessageRecipients Table
+                int counter=0;
+                while(resultSet.next()) {
+                    msgIDArray[counter] = resultSet.getInt("msgID");
+                    counter++;
+                }
+
+                selectQuery = "SELECT senderID, COUNT(*) AS numInstances FROM messages WHERE dateSent >= ? GROUP BY senderID ORDER BY senderID";
+                prepStatement = connection.prepareStatement(selectQuery);
+                prepStatement.setDate(1, sqlReferenceDate);
+                resultSet = prepStatement.executeQuery();
+
+                int index;
+
+                /*while(resultSet.next()) {
+                    index = resultSet.getInt("senderID");
+                    countArray[index] = countArray[index] + resultSet.getInt("numInstances");
+                }*/
+
+                while(resultSet.next()) {
+                    index = resultSet.getInt("senderID");
+                    countArray[index] = countArray[index] + resultSet.getInt("numInstances");
+                    countMap.put(index,resultSet.getInt("numInstances"));
+                }
+
+                selectQuery = "SELECT recipientID, COUNT(*) AS numInstances FROM messages WHERE (dateSent >= ?) AND (recipientID IS NOT NULL) GROUP BY recipientID ORDER BY recipientID";
+                prepStatement = connection.prepareStatement(selectQuery);
+                prepStatement.setDate(1, sqlReferenceDate);
+                resultSet = prepStatement.executeQuery();
+
+                /*while(resultSet.next()) {
+                    index = resultSet.getInt("recipientID");
+                    countArray[index] = countArray[index] + resultSet.getInt("numInstances");
+                }*/
+                 while(resultSet.next()) {
+                    index = resultSet.getInt("recipientID");
+                    countArray[index] = countArray[index] + resultSet.getInt("numInstances");
+                    countTemp = countMap.get(index);
+                    countMap.put(index, (countTemp + resultSet.getInt("numInstances")));
+                }
+
+                //go through all msgIDs that were sent to a group withing the time frame
+                //use groupMessageRecipients Table to find all recipients to add to count
+                for(int i=0; i<msgIDArray.length; i++){
+                    selectQuery = "SELECT recipientID FROM groupMessageRecipients WHERE msgID = ?";
                     prepStatement = connection.prepareStatement(selectQuery);
-                    prepStatement.setInt(1, tempMsgID);
-                    resultSetCount = prepStatement.executeQuery();
+                    prepStatement.setInt(1, msgIDArray[i]);
+                    resultSet = prepStatement.executeQuery();
 
-                    //count all senders and recipients of single messages
-                    while(resultSetCount.next()){
-                        tempID = resultSetCount.getInt("senderID");
-                        countArray[tempID]++;
-                        tempID = resultSetCount.getInt("recipientID");
-                        //when recipientID is null and returns O
-                        if(tempID > 0){
-                            countArray[tempID]++;
-                        }
+                    while(resultSet.next()) {
+                        countArray[resultSet.getInt("recipientID")]++;
+                        countTemp = countMap.get(resultSet.getInt("recipientID"));
+                        countMap.put(resultSet.getInt("recipientID"),++countTemp);
                     }
-                    //resultSetCount.close();
-                    //count all recipients from group messages
-                    /*selectQuery = "SELECT recipientID FROM groupMessageRecipients WHERE msgID = ?";
-                    prepStatement = connection.prepareStatement(selectQuery);
-                    prepStatement.setInt(1, tempMsgID);
-                    resultSetCount = prepStatement.executeQuery();*/
-                    //count all senders and recipients of single messages
-                    /*while(resultSetCount.next()){
-                        tempID = resultSetCount.getInt("recipientID");
-                        countArray[tempID]++;
-                    }*/
                 }
-                for(int i=0; i<numUsers; i++){
-                    System.out.print("All users total number of sent and recieved messages");
-                    System.out.println(countArray[i]);
-                }
-                /*System.out.println("test");
-                System.out.println(countArray[0]);
-                System.out.println(countArray[1]);
-                System.out.println(countArray[101]);*/
 
+                //System.out.println("All users total number of sent and recieved messages");
+                //for(int i=0; i<numUsers; i++){
+                //    System.out.println(countArray[i]);
+                //}
+                System.out.println("Map Results: ");
+                System.out.println(countMap.values());
+
+                List<Map.Entry<Integer, Integer>> list = new LinkedList<Map.Entry<Integer,Integer>>(countMap.entrySet());
+                Collections.sort(list, new Comparator<Map.Entry<Integer,Integer>>() {
+                    @Override
+                    public int compare(Entry<Integer, Integer> e1,Entry<Integer, Integer> e2) {
+                        return e2.getValue().compareTo(e1.getValue());
+                    }
+                });
+                int rank = 0;
+                int tempStore = -1;
+                System.out.println("The Top "+numMessagers+" Messagers for the past "+numMonths+" Months:");
+                for(Entry<Integer, Integer> lValue:list) {
+                    if(lValue.getValue() == tempStore){
+                        tempID = lValue.getKey();
+                        selectQuery = "SELECT fname,lname FROM users WHERE userID = ?";
+                        prepStatement = connection.prepareStatement(selectQuery);
+                        prepStatement.setLong(1, tempID);
+                        resultSet = prepStatement.executeQuery();
+                        resultSet.next();
+                        System.out.print("Rank#"+(rank)+" ");
+                        System.out.println(resultSet.getString("fname")+" "+resultSet.getString("lname")+"(UserID"+tempID+") Sent/Recieved "+lValue.getValue()+" messages.");
+                        resultSet.close();
+                    }
+                    else if(rank < numMessagers){
+                        tempID = lValue.getKey();
+                        selectQuery = "SELECT fname,lname FROM users WHERE userID = ?";
+                        prepStatement = connection.prepareStatement(selectQuery);
+                        prepStatement.setLong(1, tempID);
+                        resultSet = prepStatement.executeQuery();
+                        resultSet.next();
+                        rank++;
+                        System.out.print("Rank#"+(rank)+" ");
+                        System.out.println(resultSet.getString("fname")+" "+resultSet.getString("lname")+"(UserID"+tempID+") Sent/Recieved "+lValue.getValue()+" messages.");
+                        tempStore = lValue.getValue();
+                        resultSet.close();
+                    }
+                    else{
+                        break;
+                    }
+                }
             }
             else {
                 System.out.println("Invalid Value for Number of Months");
             }
+            resultSet.close();
         }
         catch(SQLException Ex) {
             System.out.println("Error running the sample queries.  Machine Error: " +
@@ -1218,10 +1319,10 @@ public class FaceSpaceApp {
     }
 
     public void dropUser(String userEmail){
-        try{
+        /*try{
             //do not search if term is empty
             if (userEmail.length()>1) {
-                String[] terms = search.split(" ");
+                //String[] terms = search.split(" ");
 
                 selectQuery = selectQuery + "DELETE FROM users WHERE email=?";
                 String email = user;
@@ -1248,8 +1349,7 @@ public class FaceSpaceApp {
             } catch (SQLException e) {
                 System.out.println("Cannot close Statement. Machine error: "+e.toString());
             }
-        }
-
+        }*/
     }
 
     public static void main(String args[]) throws SQLException {
