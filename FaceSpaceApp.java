@@ -436,11 +436,11 @@ public class FaceSpaceApp {
                     //Start showing names of user's Friends
                     System.out.println("Established Friends:");
                     //loop through all userIDs returned
+                    //get name from queried username (friend)
+                    selectQuery = "SELECT fname,lname FROM users WHERE userID = ?";
+                    prepStatement = connection.prepareStatement(selectQuery);
                     while(resultSet.next()){
                         friendUserID = resultSet.getLong("userID2");
-                        //get name from queried username (friend)
-                        selectQuery = "SELECT fname,lname FROM users WHERE userID = ?";
-                        prepStatement = connection.prepareStatement(selectQuery);
                         prepStatement.setLong(1, friendUserID);
                         resultSetNames = prepStatement.executeQuery();
                         //queue up the next name
@@ -448,11 +448,11 @@ public class FaceSpaceApp {
                         //print name to screen
                         System.out.println(resultSetNames.getString("fname") + " " + resultSetNames.getString("lname"));
                     }
+                    //get name from queried username (friend)
+                    selectQuery = "SELECT fname,lname FROM users WHERE userID = ?";
+                    prepStatement = connection.prepareStatement(selectQuery);
                     while(resultSet2.next()){
                         friendUserID = resultSet2.getLong("userID1");
-                        //get name from queried username (friend)
-                        selectQuery = "SELECT fname,lname FROM users WHERE userID = ?";
-                        prepStatement = connection.prepareStatement(selectQuery);
                         prepStatement.setLong(1, friendUserID);
                         resultSetNames = prepStatement.executeQuery();
                         //queue up the next name
@@ -472,11 +472,11 @@ public class FaceSpaceApp {
                     //Start showing names of user's Pending Friends
                     System.out.println("Pending Friends:");
                     //loop through all userIDs returned
+                    //get name from queried username (friend)
+                    selectQuery = "SELECT fname,lname FROM users WHERE userID = ?";
+                    prepStatement = connection.prepareStatement(selectQuery);
                     while(resultSet.next()){
                         friendUserID = resultSet.getLong("requestID");
-                        //get name from queried username (friend)
-                        selectQuery = "SELECT fname,lname FROM users WHERE userID = ?";
-                        prepStatement = connection.prepareStatement(selectQuery);
                         prepStatement.setLong(1, friendUserID);
                         resultSetNames = prepStatement.executeQuery();
                         //queue up the next name
@@ -484,11 +484,11 @@ public class FaceSpaceApp {
                         //print name to screen
                         System.out.println(resultSetNames.getString("fname") + " " + resultSetNames.getString("lname"));
                     }
+                    //get name from queried username (friend)
+                    selectQuery = "SELECT fname,lname FROM users WHERE userID = ?";
+                    prepStatement = connection.prepareStatement(selectQuery);
                     while(resultSet2.next()){
                         friendUserID = resultSet2.getLong("toID");
-                        //get name from queried username (friend)
-                        selectQuery = "SELECT fname,lname FROM users WHERE userID = ?";
-                        prepStatement = connection.prepareStatement(selectQuery);
                         prepStatement.setLong(1, friendUserID);
                         resultSetNames = prepStatement.executeQuery();
                         //queue up the next name
@@ -500,12 +500,14 @@ public class FaceSpaceApp {
                 else{
                     System.out.println("Invalid user input: No user exists with the given email");
                 }
-                resultSet.close();
+                //close resultSet
+                try { resultSet.close(); } catch (Exception ignore) { }
             }
             else{
                 System.out.println("Invalid user input: Make sure to enter the user email");
             }
-            resultSet.close();
+            //close resultSet
+            try { resultSet.close(); } catch (Exception ignore) { }
         }
         catch(SQLException Ex) {
             System.out.println("Error running the sample queries.  Machine Error: " +
@@ -1145,12 +1147,11 @@ public class FaceSpaceApp {
      public void topMessagers(int numMessagers, int numMonths){
         try {
             if (numMonths > 0) {
-                //ResultSet resultSetCount;
-                //ResultSet resultSetCount2;
-                int tempMsgID;
                 int tempID;
                 int countTemp;
-                Map <Integer, Integer> countMap = new HashMap<Integer, Integer>();
+                int index = 0;
+                Map <Integer, Integer> countMap = new HashMap<Integer, Integer>(); //used to keep track of users Send/Recieve count
+
                 //get Date and timestamp of numMonths ago
                 java.util.Date date = new java.util.Date();
                 Calendar c = Calendar.getInstance();
@@ -1159,37 +1160,16 @@ public class FaceSpaceApp {
                 date = c.getTime();
                 java.sql.Date sqlReferenceDate = new java.sql.Date(date.getTime());
 
-              //  countMap.put(1,0);
-              //  System.out.println("map: " + countMap.get(0));
-              //  System.out.println("map: " + countMap.get(1));
-              // int test =  countMap.get(1);
-              // countMap.put(1,++test);
-              //  System.out.println("map2: " + countMap.get(1));
-              //  countMap.put(1,5);
-              //  System.out.println("map3: " + countMap.get(1));
-
-                //find num of users and create array accordingly
-                statement = connection.createStatement();
-                String selectQuery = "SELECT COUNT(*) AS total FROM users";
-                resultSet = statement.executeQuery(selectQuery);
-                resultSet.next();
-                int numUsers = resultSet.getInt("total");
-                numUsers++;
-                int[] countArray = new int[numUsers];
-                System.out.println("Total NumUsers: " + (numUsers-1));
-
                 //find num of messages that are within the specified time range
                 //create msgIDArray with msg count for num messages sent to groups
-                selectQuery = "SELECT COUNT(msgID) AS total FROM messages WHERE (dateSent >= ?) AND (recipientID IS NULL)";
+                String selectQuery = "SELECT COUNT(msgID) AS total FROM messages WHERE (dateSent >= ?) AND (recipientID IS NULL)";
                 prepStatement = connection.prepareStatement(selectQuery);
                 prepStatement.setDate(1, sqlReferenceDate);
                 resultSet = prepStatement.executeQuery();
                 resultSet.next();
                 int numMsg = resultSet.getInt("total");
                 int[] msgIDArray = new int[numMsg];
-                System.out.println("Total NumGroupMsgs: " + numMsg);
 
-                //selectQuery = "SELECT msgID FROM messages WHERE (dateSent >= ?) AND (toGroupID IS NULL)";
                 selectQuery = "SELECT msgID FROM messages WHERE (dateSent >= ?) AND (recipientID IS NULL)";
                 prepStatement = connection.prepareStatement(selectQuery);
                 prepStatement.setDate(1, sqlReferenceDate);
@@ -1208,16 +1188,9 @@ public class FaceSpaceApp {
                 prepStatement.setDate(1, sqlReferenceDate);
                 resultSet = prepStatement.executeQuery();
 
-                int index;
-
-                /*while(resultSet.next()) {
-                    index = resultSet.getInt("senderID");
-                    countArray[index] = countArray[index] + resultSet.getInt("numInstances");
-                }*/
-
+                //populate map with the # a messages each user has sent
                 while(resultSet.next()) {
                     index = resultSet.getInt("senderID");
-                    countArray[index] = countArray[index] + resultSet.getInt("numInstances");
                     countMap.put(index,resultSet.getInt("numInstances"));
                 }
 
@@ -1226,39 +1199,31 @@ public class FaceSpaceApp {
                 prepStatement.setDate(1, sqlReferenceDate);
                 resultSet = prepStatement.executeQuery();
 
-                /*while(resultSet.next()) {
-                    index = resultSet.getInt("recipientID");
-                    countArray[index] = countArray[index] + resultSet.getInt("numInstances");
-                }*/
+                //add number of messages recieved by each user
                  while(resultSet.next()) {
                     index = resultSet.getInt("recipientID");
-                    countArray[index] = countArray[index] + resultSet.getInt("numInstances");
                     countTemp = countMap.get(index);
                     countMap.put(index, (countTemp + resultSet.getInt("numInstances")));
                 }
 
                 //go through all msgIDs that were sent to a group withing the time frame
                 //use groupMessageRecipients Table to find all recipients to add to count
+                selectQuery = "SELECT recipientID FROM groupMessageRecipients WHERE msgID = ?";
+                prepStatement = connection.prepareStatement(selectQuery);
                 for(int i=0; i<msgIDArray.length; i++){
-                    selectQuery = "SELECT recipientID FROM groupMessageRecipients WHERE msgID = ?";
-                    prepStatement = connection.prepareStatement(selectQuery);
                     prepStatement.setInt(1, msgIDArray[i]);
                     resultSet = prepStatement.executeQuery();
 
+                    //add number of messages recieved by each user from a group Message
                     while(resultSet.next()) {
-                        countArray[resultSet.getInt("recipientID")]++;
                         countTemp = countMap.get(resultSet.getInt("recipientID"));
                         countMap.put(resultSet.getInt("recipientID"),++countTemp);
                     }
+
+                    try { resultSet.close(); } catch (Exception ignore) { }
                 }
 
-                //System.out.println("All users total number of sent and recieved messages");
-                //for(int i=0; i<numUsers; i++){
-                //    System.out.println(countArray[i]);
-                //}
-                System.out.println("Map Results: ");
-                System.out.println(countMap.values());
-
+                //sort countMap so the top X number of users can be displayed
                 List<Map.Entry<Integer, Integer>> list = new LinkedList<Map.Entry<Integer,Integer>>(countMap.entrySet());
                 Collections.sort(list, new Comparator<Map.Entry<Integer,Integer>>() {
                     @Override
@@ -1268,7 +1233,8 @@ public class FaceSpaceApp {
                 });
                 int rank = 0;
                 int tempStore = -1;
-                System.out.println("The Top "+numMessagers+" Messagers for the past "+numMonths+" Months:");
+                //display data, users with same number of sent/recieved messages recieve the same Rank
+                System.out.println("\n"+"The Top "+numMessagers+" Messagers for the past "+numMonths+" Months:");
                 for(Entry<Integer, Integer> lValue:list) {
                     if(lValue.getValue() == tempStore){
                         tempID = lValue.getKey();
@@ -1278,8 +1244,8 @@ public class FaceSpaceApp {
                         resultSet = prepStatement.executeQuery();
                         resultSet.next();
                         System.out.print("Rank#"+(rank)+" ");
-                        System.out.println(resultSet.getString("fname")+" "+resultSet.getString("lname")+"(UserID"+tempID+") Sent/Recieved "+lValue.getValue()+" messages.");
-                        resultSet.close();
+                        System.out.println(resultSet.getString("fname")+" "+resultSet.getString("lname")+"(UserID-"+tempID+") Sent/Recieved "+lValue.getValue()+" messages.");
+                        //resultSet.close();
                     }
                     else if(rank < numMessagers){
                         tempID = lValue.getKey();
@@ -1290,9 +1256,9 @@ public class FaceSpaceApp {
                         resultSet.next();
                         rank++;
                         System.out.print("Rank#"+(rank)+" ");
-                        System.out.println(resultSet.getString("fname")+" "+resultSet.getString("lname")+"(UserID"+tempID+") Sent/Recieved "+lValue.getValue()+" messages.");
+                        System.out.println(resultSet.getString("fname")+" "+resultSet.getString("lname")+"(UserID-"+tempID+") Sent/Recieved "+lValue.getValue()+" messages.");
                         tempStore = lValue.getValue();
-                        resultSet.close();
+                        //resultSet.close();
                     }
                     else{
                         break;
@@ -1302,7 +1268,8 @@ public class FaceSpaceApp {
             else {
                 System.out.println("Invalid Value for Number of Months");
             }
-            resultSet.close();
+            //close resultSet
+            try { resultSet.close(); } catch (Exception ignore) { }
         }
         catch(SQLException Ex) {
             System.out.println("Error running the sample queries.  Machine Error: " +
@@ -1312,6 +1279,7 @@ public class FaceSpaceApp {
             try {
                 if (statement != null) statement.close();
                 if (prepStatement != null) prepStatement.close();
+                if (resultSet != null) resultSet.close();
             } catch (SQLException e) {
                 System.out.println("Cannot close Statement. Machine error: "+e.toString());
             }
