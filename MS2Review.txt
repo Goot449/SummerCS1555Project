@@ -1,0 +1,4 @@
+Java user interface is very clear and easy to follow.
+
+Make sure every function works as they supposed to be. Your dropUser function doesn't work.
+
