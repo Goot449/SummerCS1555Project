@@ -98,12 +98,14 @@ CREATE TABLE groupMessageRecipients
 
 --trigger on Insert into messages that ensures that a messages is only sent to a single recipient or single group and not both.
 --needed to be trigger in order to drop user and delete a single ID from the messages table
-CREATE TRIGGER check_messages
+CREATE OR REPLACE TRIGGER check_messages
     BEFORE INSERT ON messages
     FOR EACH ROW
     BEGIN
        IF NOT((:new.recipientID IS NOT NULL AND :new.toGroupID IS NULL) OR (:new.toGroupID IS NOT NULL AND :new.recipientID IS NULL))
-            THEN RAISE_APPLICATION_ERROR(-20001, 'Cannot Insert into Messages because of NULL values');
+            THEN RAISE_APPLICATION_ERROR(-20001, 'Cannot Insert into Messages because recipientID and toGroupID are not XOR (1 and only one must be NULL)');
+       ELSIF (:new.senderID IS NULL)
+            THEN RAISE_APPLICATION_ERROR(-20002, 'Cannot Insert into Messages because senderID is NULL');
        END IF;
     END;
 /
@@ -803,5 +805,8 @@ INSERT INTO messages VALUES(297,2  ,NULL,10,'Group Announcement','I will be in h
 INSERT INTO messages VALUES(298,4  ,NULL,10,'Group Announcement','Everyone welcome Tim as the newest admin'       ,TO_DATE('12/01/2016','mm/dd/yyyy'));
 INSERT INTO messages VALUES(299,4  ,NULL,10,'Group Announcement','share our group and make us well known!'        ,TO_DATE('12/01/2016','mm/dd/yyyy'));
 INSERT INTO messages VALUES(300,1  ,NULL,10,'Group Announcement','Hope youre all enjoying the group'              ,TO_DATE('12/01/2016','mm/dd/yyyy'));
+INSERT INTO messages VALUES(301,NULL  ,NULL,10,'Group Announcement','Hope youre all enjoying the group'              ,TO_DATE('12/01/2016','mm/dd/yyyy'));
+INSERT INTO messages VALUES(302,1  ,NULL,NULL,'Group Announcement','Hope youre all enjoying the group'              ,TO_DATE('12/01/2016','mm/dd/yyyy'));
+INSERT INTO messages VALUES(303,1  ,10,10,'Group Announcement','Hope youre all enjoying the group'              ,TO_DATE('12/01/2016','mm/dd/yyyy'));
 
 commit;
