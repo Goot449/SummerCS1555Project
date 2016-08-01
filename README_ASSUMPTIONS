@@ -1,0 +1,11 @@
+CS1555 Summer Term 2016
+Database TermProject Assumptions
+
+Group: Nathan Spangler, Connor Kazmierczak, Jacob Guttenplan
+
+1. person running this program first sourced bash.env on unix as well as ran
+   our database.sql file prior to running the FaceSpaceApp program
+
+2. a message can be sent without a senderID, for the sender could be spam
+
+
