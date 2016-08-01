@@ -80,8 +80,8 @@ CREATE TABLE messages
     message VARCHAR2(100) NOT NULL,
     dateSent DATE NOT NULL,
     CONSTRAINT msg_pk PRIMARY KEY (msgID),
-    CONSTRAINT msg_fk1 FOREIGN KEY (senderID) REFERENCES users(userID) ON DELETE SET NULL,
-    CONSTRAINT msg_check CHECK ((recipientID IS NOT NULL AND toGroupID IS NULL) OR (toGroupID IS NOT NULL AND recipientID IS NULL))
+    CONSTRAINT msg_fk1 FOREIGN KEY (senderID) REFERENCES users(userID) ON DELETE SET NULL
+    --CONSTRAINT msg_check CHECK ((recipientID IS NOT NULL AND toGroupID IS NULL) OR (toGroupID IS NOT NULL AND recipientID IS NULL))
     --check to make sure there is a recipient or group to receive message
 );
 
@@ -95,6 +95,18 @@ CREATE TABLE groupMessageRecipients
     CONSTRAINT groupMessageRecipients_fk1 FOREIGN KEY (msgID) REFERENCES messages(msgID),
     CONSTRAINT groupMessageRecipients_fk2 FOREIGN KEY (recipientID) REFERENCES users(userID) ON DELETE CASCADE
 );
+
+--trigger on Insert into messages that ensures that a messages is only sent to a single recipient or single group and not both.
+--needed to be trigger in order to drop user and delete a single ID from the messages table
+CREATE TRIGGER check_messages
+    BEFORE INSERT ON messages
+    FOR EACH ROW
+    BEGIN
+       IF NOT((:new.recipientID IS NOT NULL AND :new.toGroupID IS NULL) OR (:new.toGroupID IS NOT NULL AND :new.recipientID IS NULL))
+            THEN RAISE_APPLICATION_ERROR(-20001, 'Cannot Insert into Messages because of NULL values');
+       END IF;
+    END;
+/
 
 --When a message to a group is inserted into Messages
 --This trigger will populate the groupMessageRecipients table with the recipients of the message in the group
