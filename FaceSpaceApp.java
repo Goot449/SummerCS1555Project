@@ -1290,13 +1290,23 @@ public class FaceSpaceApp {
             if (userEmail.length()>1) {
                 //String[] terms = search.split(" ");
                 ResultSet resultSetSearch;
-                String selectQuery = "SELECT fname,lname FROM users WHERE email = ?";
+                String selectQuery = "SELECT fname,lname,userID FROM users WHERE email = ?";
                 prepStatement = connection.prepareStatement(selectQuery);
                 prepStatement.setString(1, userEmail);
                 resultSetSearch = prepStatement.executeQuery();
                 //if user exists continue
                 if (resultSetSearch.next()) {
                     String nameDisplay = resultSetSearch.getString("fname") + " " + resultSetSearch.getString("lname");;
+                    long userID = resultSetSearch.getLong("userID");
+                    //Set message recipients to null
+                    ResultSet resultSetMessages;
+                    String messageQuery;
+                    messageQuery = "UPDATE messages SET recipientID=null WHERE recipientID=?";
+                    prepStatement = connection.prepareStatement(messageQuery);
+                    prepStatement.setLong(1, userID);
+                    resultSetMessages = prepStatement.executeQuery();
+                    //delete user
+
                     String deleteQuery;
                     ResultSet resultSetEmail;
                     deleteQuery = "DELETE FROM users WHERE email=?";
