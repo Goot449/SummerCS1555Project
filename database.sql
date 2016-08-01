@@ -31,8 +31,8 @@ CREATE TABLE friends
     userID2 NUMBER(10) NOT NULL,
     dateEstablished DATE NOT NULL,
     CONSTRAINT friends_pk PRIMARY KEY (userID1, userID2),
-    CONSTRAINT friends_fk1 FOREIGN KEY (userID1) REFERENCES users(userID),
-    CONSTRAINT friends_fk2 FOREIGN KEY (userID2) REFERENCES users(userID)
+    CONSTRAINT friends_fk1 FOREIGN KEY (userID1) REFERENCES users(userID) ON DELETE CASCADE,
+    CONSTRAINT friends_fk2 FOREIGN KEY (userID2) REFERENCES users(userID) ON DELETE CASCADE
 );
 
 CREATE TABLE pendingFriends
@@ -62,7 +62,7 @@ CREATE TABLE groupMembership
     userID NUMBER(10) NOT NULL,
     CONSTRAINT groupMembership_pk PRIMARY KEY (groupID, userID),
     CONSTRAINT groupMembership_fk1 FOREIGN KEY (groupID) REFERENCES groupInfo(groupID),
-    CONSTRAINT groupMembership_fk2 FOREIGN KEY (userID) REFERENCES users(userID)
+    CONSTRAINT groupMembership_fk2 FOREIGN KEY (userID) REFERENCES users(userID) ON DELETE CASCADE
 );
 --user is prompted via the createGroup() function to set groupInfo.memberLimit
 --addToGroup() function will enforce the groupInfo.memberLimit
@@ -73,14 +73,14 @@ CREATE TABLE groupMembership
 CREATE TABLE messages
 (
     msgID NUMBER(10) NOT NULL,
-    senderID NUMBER(10) NOT NULL,
+    senderID NUMBER(10) DEFAULT NULL,
     recipientID NUMBER(10) DEFAULT NULL,
     toGroupID NUMBER(10) DEFAULT NULL,
     subject VARCHAR2(50) NOT NULL,
     message VARCHAR2(100) NOT NULL,
     dateSent DATE NOT NULL,
     CONSTRAINT msg_pk PRIMARY KEY (msgID),
-    CONSTRAINT msg_fk1 FOREIGN KEY (senderID) REFERENCES users(userID),
+    CONSTRAINT msg_fk1 FOREIGN KEY (senderID) REFERENCES users(userID) ON DELETE SET NULL,
     CONSTRAINT msg_check CHECK ((recipientID IS NOT NULL AND toGroupID IS NULL) OR (toGroupID IS NOT NULL AND recipientID IS NULL))
     --check to make sure there is a recipient or group to receive message
 );
@@ -93,7 +93,7 @@ CREATE TABLE groupMessageRecipients
     recipientID NUMBER(10) NOT NULL,
     CONSTRAINT groupMessageRecipients_pk PRIMARY KEY (msgID, recipientID),
     CONSTRAINT groupMessageRecipients_fk1 FOREIGN KEY (msgID) REFERENCES messages(msgID),
-    CONSTRAINT groupMessageRecipients_fk2 FOREIGN KEY (recipientID) REFERENCES users(userID)
+    CONSTRAINT groupMessageRecipients_fk2 FOREIGN KEY (recipientID) REFERENCES users(userID) ON DELETE CASCADE
 );
 
 --When a message to a group is inserted into Messages
@@ -113,6 +113,19 @@ CREATE OR REPLACE TRIGGER GroupMessage
         END IF;
     END;
 /
+
+-- A message is deleted only when both the sender and all receivers are deleted
+CREATE OR REPLACE TRIGGER DropUserMessages
+BEFORE DELETE ON users
+    BEGIN
+            DELETE FROM messages
+            WHERE 	(senderID NOT IN (SELECT userID FROM users))
+                   AND ( recipientID NOT IN (SELECT userID FROM users) );
+            DELETE FROM groupMessageRecipients
+            WHERE 	(recipientID NOT IN (SELECT userID FROM users));
+    END;
+/
+
 
 --create 100 users
 INSERT INTO users VALUES (1, 'jimmy', 'john', 'jimjohn@gmail.com', TO_DATE('01/02/1999', 'mm/dd/yyyy'), NULL);

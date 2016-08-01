@@ -975,7 +975,7 @@ public class FaceSpaceApp {
                     if (i > 1) {
                         selectQuery = selectQuery + " UNION ";
                     }
-                    selectQuery = selectQuery + "SELECT DISTINCT fname,lname FROM users WHERE (fname LIKE ? OR lname LIKE ? OR email LIKE ?)";
+                    selectQuery = selectQuery + "SELECT DISTINCT fname,lname,email FROM users WHERE (fname LIKE ? OR lname LIKE ? OR email LIKE ?)";
                 }
                 //Prepare Statement
                 prepStatement = connection.prepareStatement(selectQuery);
@@ -994,7 +994,7 @@ public class FaceSpaceApp {
                 //queue up the next name
                 while(resultSetSearch.next()){
                     //print name to screen
-                    System.out.println(resultSetSearch.getString("fname") + " " + resultSetSearch.getString("lname"));
+                    System.out.println(resultSetSearch.getString("fname") + " " + resultSetSearch.getString("lname") +" - " + resultSetSearch.getString("email"));
                 }
             }else{
                 System.out.println("No search term entered.");
@@ -1014,8 +1014,6 @@ public class FaceSpaceApp {
         }
 
     }
-
-
 
     public void threeDegrees(String emailA, String emailB){
         try{
@@ -1287,27 +1285,38 @@ public class FaceSpaceApp {
     }
 
     public void dropUser(String userEmail){
-        /*try{
+        try{
             //do not search if term is empty
             if (userEmail.length()>1) {
                 //String[] terms = search.split(" ");
-
-                selectQuery = selectQuery + "DELETE FROM users WHERE email=?";
-                String email = user;
-                prepStatement.setString(1,userEmail);
-
-                resultSetEmail = prepStatement.executeQuery();
-                //queue up the next name
-                while(resultSetSearch.next()){
-                    //print name to screen
-                    System.out.println("User Deleted");
+                ResultSet resultSetSearch;
+                String selectQuery = "SELECT fname,lname FROM users WHERE email = ?";
+                prepStatement = connection.prepareStatement(selectQuery);
+                prepStatement.setString(1, userEmail);
+                resultSetSearch = prepStatement.executeQuery();
+                //if user exists continue
+                if (resultSetSearch.next()) {
+                    String nameDisplay = resultSetSearch.getString("fname") + " " + resultSetSearch.getString("lname");;
+                    String deleteQuery;
+                    ResultSet resultSetEmail;
+                    deleteQuery = "DELETE FROM users WHERE email=?";
+                    prepStatement = connection.prepareStatement(deleteQuery);
+                    prepStatement.setString(1, userEmail);
+                    resultSetEmail = prepStatement.executeQuery();
+                    //queue up the next name
+                    resultSetEmail.next();
+                    System.out.println(nameDisplay +" Deleted");
+                }else
+                {
+                    System.out.println("User Not Found in System.");
                 }
+
             }else{
                 System.out.println("No search term entered.");
             }
         }
         catch(SQLException Ex) {
-            System.out.println("Error running the sample queries.  Machine Error: " +
+            System.out.println("Error running the query.  Machine Error: " +
                     Ex.toString());
         }
         finally{
@@ -1317,7 +1326,7 @@ public class FaceSpaceApp {
             } catch (SQLException e) {
                 System.out.println("Cannot close Statement. Machine error: "+e.toString());
             }
-        }*/
+        }
     }
 
     public static void main(String args[]) throws SQLException {
