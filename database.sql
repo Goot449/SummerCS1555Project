@@ -130,13 +130,10 @@ CREATE OR REPLACE TRIGGER GroupMessage
 
 -- A message is deleted only when both the sender and all receivers are deleted
 CREATE OR REPLACE TRIGGER DropUserMessages
-BEFORE DELETE ON users
+AFTER DELETE ON users
     BEGIN
-            DELETE FROM messages
-            WHERE 	(senderID NOT IN (SELECT userID FROM users))
-                   AND ( recipientID NOT IN (SELECT userID FROM users) );
-            DELETE FROM groupMessageRecipients
-            WHERE 	(recipientID NOT IN (SELECT userID FROM users));
+        DELETE FROM messages
+        WHERE 	(senderID IS NULL AND recipientID IS NULL AND toGroupID IS NULL);
     END;
 /
 
@@ -805,8 +802,5 @@ INSERT INTO messages VALUES(297,2  ,NULL,10,'Group Announcement','I will be in h
 INSERT INTO messages VALUES(298,4  ,NULL,10,'Group Announcement','Everyone welcome Tim as the newest admin'       ,TO_DATE('12/01/2016','mm/dd/yyyy'));
 INSERT INTO messages VALUES(299,4  ,NULL,10,'Group Announcement','share our group and make us well known!'        ,TO_DATE('12/01/2016','mm/dd/yyyy'));
 INSERT INTO messages VALUES(300,1  ,NULL,10,'Group Announcement','Hope youre all enjoying the group'              ,TO_DATE('12/01/2016','mm/dd/yyyy'));
-INSERT INTO messages VALUES(301,NULL  ,NULL,10,'Group Announcement','Hope youre all enjoying the group'              ,TO_DATE('12/01/2016','mm/dd/yyyy'));
-INSERT INTO messages VALUES(302,1  ,NULL,NULL,'Group Announcement','Hope youre all enjoying the group'              ,TO_DATE('12/01/2016','mm/dd/yyyy'));
-INSERT INTO messages VALUES(303,1  ,10,10,'Group Announcement','Hope youre all enjoying the group'              ,TO_DATE('12/01/2016','mm/dd/yyyy'));
 
 commit;
