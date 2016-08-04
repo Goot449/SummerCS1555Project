@@ -8,4 +8,11 @@ Group: Nathan Spangler, Connor Kazmierczak, Jacob Guttenplan
 
 2. a message can be sent without a senderID, for the sender could be spam
 
+3. A message can be sent to a group by a non Member. "hey I would like to join"
+
+4. Group Names are case sensitive
+
+5. Methods check for user input errors but just return an error message.
+    This is to ensure the driver doesn't get stuck in the method if an input is wrong.
+
 
