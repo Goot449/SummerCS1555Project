@@ -817,7 +817,6 @@ public class FaceSpaceApp {
                 resultSet = prepStatement.executeQuery();
                 if(resultSet.next()){
                     userID = resultSet.getLong("userID");
-
                     // display all messages to user
                     selectQuery = "SELECT * FROM messages WHERE recipientID = ?";
                     prepStatement = connection.prepareStatement(selectQuery);
@@ -826,7 +825,6 @@ public class FaceSpaceApp {
                     while(resultSet.next()) {
                         System.out.println(resultSet.getString("subject") + "    " + resultSet.getString("message"));
                     }
-
                     // display all messages to user's groups
                     selectQuery = "SELECT * FROM groupMessageRecipients WHERE recipientID = ?";
                     prepStatement = connection.prepareStatement(selectQuery);
@@ -837,10 +835,10 @@ public class FaceSpaceApp {
                         long messageID = resultSet.getLong("msgID");
                         resultStack.push(new Long(messageID));
                     }
-
+                    
+                    selectQuery = "SELECT * FROM messages WHERE msgID = ?";
+                    prepStatement = connection.prepareStatement(selectQuery);
                     while(!resultStack.empty()){
-                        selectQuery = "SELECT * FROM messages WHERE msgID = ?";
-                        prepStatement = connection.prepareStatement(selectQuery);
                         Long messageID = (Long)resultStack.pop();
                         prepStatement.setLong(1, messageID);
                         resultSet = prepStatement.executeQuery();
@@ -868,7 +866,7 @@ public class FaceSpaceApp {
         }
         catch(SQLException Ex) {
             System.out.println("Error executing displayMessages()");
-            //System.out.println("Oracle Error: " + Ex.toString());
+            System.out.println("Oracle Error: " + Ex.toString());
         }
         finally{
             try {
@@ -922,9 +920,9 @@ public class FaceSpaceApp {
                             resultStack.push(new Long(messageID));
                         }
 
+                        selectQuery = "SELECT * FROM messages WHERE msgID = ?";
+                        prepStatement = connection.prepareStatement(selectQuery);
                         while(!resultStack.empty()){
-                            selectQuery = "SELECT * FROM messages WHERE msgID = ?";
-                            prepStatement = connection.prepareStatement(selectQuery);
                             Long messageID = (Long)resultStack.pop();
                             prepStatement.setLong(1, messageID);
                             resultSet = prepStatement.executeQuery();

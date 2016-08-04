@@ -10,6 +10,10 @@ public class testDriver {
         System.out.println("***create user Billy Joe***");
         testApp.createUser("billy","joe","testuser@gmail.com","04/05/1995");
         System.out.println();
+        
+        System.out.println("***try to create user using Billy's email***");
+        testApp.createUser("billy","joe","testuser@gmail.com","04/05/1995");
+        System.out.println();
 
         //test initiateFriendship()
         System.out.println("***Nate Spangler friend Requests Billy Joe***");
@@ -52,11 +56,6 @@ public class testDriver {
         System.out.println("***Create DriverGroup again to make sure we get an error***");
         testApp.createGroup("DriverGroup","this group should fail to create",6);
 
-        //displayMessages
-        System.out.println();
-        System.out.println("***Display ALL Messages for Nate***");
-        testApp.displayMessages("spangy@gmail.com");
-
         //sendMessage to user
         System.out.println();
         System.out.println("***Send Message directly to Billy from Jimmy***");
@@ -69,7 +68,7 @@ public class testDriver {
 
         //displayMessages
         System.out.println();
-        System.out.println("***Display Messages for Billy***");
+        System.out.println("***Display All Messages for Billy***");
         testApp.displayMessages("testuser@gmail.com");
 
         //test displayNewMessages()
@@ -129,6 +128,24 @@ public class testDriver {
         System.out.println();
         System.out.println("***Display Top 3 Messagers Over the past 5 months***");
         testApp.topMessagers(3,5);
+        
+        //test dropUser()
+        System.out.println();
+        System.out.println("***Drop Nate from Users List***");
+        testApp.dropUser("spangy@gmail.com");
+        
+        System.out.println();
+        System.out.println("***Show Billy's friends (notice Nate is gone)***");
+        testApp.displayFriends("testuser@gmail.com");
+        
+        System.out.println();
+        System.out.println("***Display Messages for Nate after he is removed***");
+        testApp.displayMessages("spangy@gmail.com");
+        
+        System.out.println();
+        System.out.println("***Display Messages for Billy the message from Nate is still there***");
+        testApp.displayMessages("testuser@gmail.com");
+        
 
 
     }
