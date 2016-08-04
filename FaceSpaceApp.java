@@ -83,63 +83,63 @@ public class FaceSpaceApp {
                     String name = scanner.next();
                     System.out.print("Enter Group Description: ");
                     String description = scanner.next();
-                    System.out.println("Set Member Limit: ");
+                    System.out.print("Set Member Limit: ");
                     int memberLimit = Integer.parseInt(scanner.next());
 
                     createGroup(name, description, memberLimit);
                 }
                 else if(command == 6){
                     System.out.println("**Add Member To Group**");
-                    System.out.println("Enter New Member's Email: ");
+                    System.out.print("Enter New Member's Email: ");
                     String email = scanner.next();
-                    System.out.println("Enter Group Name: ");
+                    System.out.print("Enter Group Name: ");
                     String groupName = scanner.next();
 
                     addToGroup(email, groupName);
                 }
                 else if(command == 7){
                     System.out.println("**Send Message To User**");
-                    System.out.println("Enter Message's Subject: ");
+                    System.out.print("Enter Message's Subject: ");
                     String subject = scanner.next();
-                    System.out.println("Enter Message's Body Text: ");
+                    System.out.print("Enter Message's Body Text: ");
                     String body = scanner.next();
-                    System.out.println("Enter Recipients Email: ");
+                    System.out.print("Enter Recipients Email: ");
                     String recipientEmail = scanner.next();
-                    System.out.println("Enter Sender's Email: ");
+                    System.out.print("Enter Sender's Email: ");
                     String senderEmail = scanner.next();
 
                     sendMessageToUser(subject, body, recipientEmail, senderEmail);
                 }
                 else if(command == 8){
                     System.out.println("**Send Message To Group**");
-                    System.out.println("Enter Message's Subject: ");
+                    System.out.print("Enter Message's Subject: ");
                     String subject = scanner.next();
-                    System.out.println("Enter Message's Body Text: ");
+                    System.out.print("Enter Message's Body Text: ");
                     String body = scanner.next();
-                    System.out.println("Enter Group Name: ");
+                    System.out.print("Enter Group Name: ");
                     String groupName = scanner.next();
-                    System.out.println("Enter Sender's Email: ");
+                    System.out.print("Enter Sender's Email: ");
                     String senderEmail = scanner.next();
 
                     sendMessageToGroup(subject, body, groupName, senderEmail);
                 }
                 else if(command == 9){
                     System.out.println("**Display Messages**");
-                    System.out.println("Enter User's Email: ");
+                    System.out.print("Enter User's Email: ");
                     String userEmail = scanner.next();
 
                     displayMessages(userEmail);
                 }
                 else if(command == 10){
                     System.out.println("**Display New Messages**");
-                    System.out.println("Enter User's Email: ");
+                    System.out.print("Enter User's Email: ");
                     String userEmail = scanner.next();
 
                     displayNewMessages(userEmail);
                 }
                 else if(command == 11){
                     System.out.println("**Search For User**");
-                    System.out.println("Enter Search: ");
+                    System.out.print("Enter Search: ");
                     scanner.nextLine();
                     String search = scanner.nextLine();
 
