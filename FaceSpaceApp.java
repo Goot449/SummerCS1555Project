@@ -206,7 +206,7 @@ public class FaceSpaceApp {
                 if( !fname.isEmpty() && !lname.isEmpty() && !email.isEmpty() &&  date != null){
                     // query number of users to increment to next user id
                     statement = connection.createStatement();
-                    selectQuery = "SELECT COUNT(*) AS total FROM users";
+                    selectQuery = "SELECT MAX(userID) AS total FROM users";
                     resultSet = statement.executeQuery(selectQuery);
                     resultSet.next();
                     int ids = resultSet.getInt("total");
@@ -676,7 +676,7 @@ public class FaceSpaceApp {
 
                         // query number of messages to increment to next msg id
                         statement = connection.createStatement();
-                        selectQuery = "SELECT COUNT(*) AS total FROM messages";
+                        selectQuery = "SELECT MAX(msgID) AS total FROM messages";
                         resultSet = statement.executeQuery(selectQuery);
                         resultSet.next();
                         int ids = resultSet.getInt("total");
@@ -753,7 +753,7 @@ public class FaceSpaceApp {
 
                         // query number of messages to increment to next msg id
                         statement = connection.createStatement();
-                        selectQuery = "SELECT COUNT(*) AS total FROM messages";
+                        selectQuery = "SELECT MAX(msgID) AS total FROM messages";
                         resultSet = statement.executeQuery(selectQuery);
                         resultSet.next();
                         int ids = resultSet.getInt("total");
