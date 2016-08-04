@@ -54,17 +54,17 @@ public class testDriver {
 
         //displayMessages
         System.out.println();
-        System.out.println("***Display Messages for Nate***");
+        System.out.println("***Display ALL Messages for Nate***");
         testApp.displayMessages("spangy@gmail.com");
 
         //sendMessage to user
         System.out.println();
-        System.out.println("***Send Message directly to Billy***");
+        System.out.println("***Send Message directly to Billy from Jimmy***");
         testApp.sendMessageToUser("Test User Subject","test user bod","testuser@gmail.com","jimjohn@gmail.com");
 
         //sendMessage to group
         System.out.println();
-        System.out.println("***Send Message to DriverGroup (that Billy is part of)***");
+        System.out.println("***Send Message to DriverGroup (that Billy is part of) from Nate***");
         testApp.sendMessageToGroup("Test Group Subject","test group bod","DriverGroup","spangy@gmail.com");
 
         //displayMessages
@@ -76,22 +76,59 @@ public class testDriver {
         System.out.println();
         System.out.println("***Display New Messages for Timmy***");
         testApp.displayNewMessages("timjohn@gmail.com");
-        
+
         System.out.println();
         System.out.println("***Display New Messages for Timmy again (notice no messages now that his last login is now)***");
         testApp.displayNewMessages("timjohn@gmail.com");
 
-        //test searchForUser()
 
+        //test searchForUser()
+        System.out.println();
+        System.out.println("***Search for <empty String> in users list***");
+        testApp.searchForUser("");
+
+        System.out.println();
+        System.out.println("***Search for <1 character> in users list***");
+        testApp.searchForUser("a");
+
+        System.out.println();
+        System.out.println("***Search for <al> in users list***");
+        testApp.searchForUser("al");
+
+        System.out.println();
+        System.out.println("***Search for <ric> in users list***");
+        testApp.searchForUser("ric");
 
         //test threeDegrees()
+        System.out.println();
+        System.out.println("***Run Three Degrees from JIM John to TIM John***");
+        testApp.threeDegrees("jimjohn@gmail.com","timjohn@gmail.com");
 
+        //test threeDegrees()
+        System.out.println();
+        System.out.println("***Run Three Degrees from TIM John to JIM John***");
+        testApp.threeDegrees("timjohn@gmail.com","jimjohn@gmail.com");
 
         //test topMessagers()
-
+        System.out.println();
+        System.out.println("***Display Top 3 Messagers Over the past 24 months***");
+        testApp.topMessagers(3,24);
 
         //test dropUser()
+        System.out.println();
+        System.out.println("***Drop Rick Kot (UserID-10) from Users List***");
+        testApp.dropUser("kotrr8@gmail.com");
 
+        //test topMessagers()
+        System.out.println();
+        System.out.println("***Display Top 5 Messagers Over the past 24 months***");
+        System.out.println("*Note: Rick Kot has been dropped and no longer listed*");
+        testApp.topMessagers(5,24);
+
+        //test topMessagers()
+        System.out.println();
+        System.out.println("***Display Top 3 Messagers Over the past 5 months***");
+        testApp.topMessagers(3,5);
 
 
     }
