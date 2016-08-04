@@ -72,17 +72,14 @@ public class testDriver {
         System.out.println("***Display Messages for Billy***");
         testApp.displayMessages("testuser@gmail.com");
 
-        //test sendMessageToUser()
-
-
-        //test sendMessageToGroup()
-
-
-        //test displayMessages()
-
-
         //test displayNewMessages()
-
+        System.out.println();
+        System.out.println("***Display New Messages for Timmy***");
+        testApp.displayNewMessages("timjohn@gmail.com");
+        
+        System.out.println();
+        System.out.println("***Display New Messages for Timmy again (notice no messages now that his last login is now)***");
+        testApp.displayNewMessages("timjohn@gmail.com");
 
         //test searchForUser()
 
