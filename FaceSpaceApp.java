@@ -237,7 +237,7 @@ public class FaceSpaceApp {
         }
         catch(SQLException Ex) {
             System.out.println("Error executing createUser()");
-            System.out.println("Oracle Error: " + Ex.toString());
+            //System.out.println("Oracle Error: " + Ex.toString());
         }
         catch (ParseException ex) {
             System.out.println("Invalid user input: Make sure no values are empty and the date format is mm/dd/yyyy");
@@ -318,7 +318,7 @@ public class FaceSpaceApp {
         }
         catch(SQLException Ex) {
             System.out.println("Error executing initiateFriendship()");
-            System.out.println("Oracle Error: " + Ex.toString());
+            //System.out.println("Oracle Error: " + Ex.toString());
         }
         finally{
             try {
@@ -406,7 +406,7 @@ public class FaceSpaceApp {
         }
         catch(SQLException Ex) {
             System.out.println("Error executing establishFriendship()");
-            System.out.println("Oracle Error: " + Ex.toString());
+            //System.out.println("Oracle Error: " + Ex.toString());
         }
         finally{
             try {
@@ -521,7 +521,7 @@ public class FaceSpaceApp {
         }
         catch(SQLException Ex) {
             System.out.println("Error executing displayFriends()");
-            System.out.println("Oracle Error: " + Ex.toString());
+            //System.out.println("Oracle Error: " + Ex.toString());
         }
         finally{
             try {
@@ -562,9 +562,9 @@ public class FaceSpaceApp {
             }
         }
         catch(SQLException Ex) {
-            System.out.println("Error executing createGroup()");
+            //System.out.println("Error executing createGroup()");
             System.out.println("This group already exists! (group names are case sensitive)");
-            System.out.println("Oracle Error: " + Ex.toString());
+            //System.out.println("Oracle Error: " + Ex.toString());
         }
         finally{
             try {
@@ -635,9 +635,9 @@ public class FaceSpaceApp {
             }
         }
         catch(SQLException Ex) {
-            System.out.println("Error executing addToGroup()");
+            //System.out.println("Error executing addToGroup()");
             System.out.println("This user is already in the group!");
-            System.out.println("Oracle Error: " + Ex.toString());
+            //System.out.println("Oracle Error: " + Ex.toString());
         }
         finally{
             try {
@@ -714,7 +714,7 @@ public class FaceSpaceApp {
         }
         catch(SQLException Ex) {
             System.out.println("Error executing sendMessageToUser()");
-            System.out.println("Oracle Error: " + Ex.toString());
+            //System.out.println("Oracle Error: " + Ex.toString());
         }
         finally{
             try {
@@ -791,7 +791,7 @@ public class FaceSpaceApp {
         }
         catch(SQLException Ex) {
             System.out.println("Error executing sendMessageToGroup()");
-            System.out.println("Oracle Error: " + Ex.toString());
+            //System.out.println("Oracle Error: " + Ex.toString());
         }
         finally{
             try {
@@ -868,7 +868,7 @@ public class FaceSpaceApp {
         }
         catch(SQLException Ex) {
             System.out.println("Error executing displayMessages()");
-            System.out.println("Oracle Error: " + Ex.toString());
+            //System.out.println("Oracle Error: " + Ex.toString());
         }
         finally{
             try {
@@ -954,7 +954,7 @@ public class FaceSpaceApp {
         }
         catch(SQLException Ex) {
             System.out.println("Error executing sendNewMessageToUser()");
-            System.out.println("Oracle Error: " + Ex.toString());
+            //System.out.println("Oracle Error: " + Ex.toString());
         }
         finally{
             try {
@@ -1015,7 +1015,7 @@ public class FaceSpaceApp {
         }
         catch(SQLException Ex) {
             System.out.println("Error executing searchForUser()");
-            System.out.println("Oracle Error: " + Ex.toString());
+            //System.out.println("Oracle Error: " + Ex.toString());
         }
         finally{
             try {
@@ -1051,7 +1051,7 @@ public class FaceSpaceApp {
                         resultSet = prepStatement.executeQuery();
                         if(resultSet.next()) {
                             BID = resultSet.getLong("userID");
-                            
+
                             // store the A user name for printing
                             selectQuery = "SELECT fname FROM users WHERE userID = ?";
                             prepStatement = connection.prepareStatement(selectQuery);
@@ -1059,15 +1059,15 @@ public class FaceSpaceApp {
                             resultSet = prepStatement.executeQuery();
                             resultSet.next();
                             String Afname = resultSet.getString("fname");
-                                
+
                             // store the B user name for printing
                             selectQuery = "SELECT fname FROM users WHERE userID = ?";
                             prepStatement = connection.prepareStatement(selectQuery);
                             prepStatement.setLong(1, BID);
                             resultSet = prepStatement.executeQuery();
                             resultSet.next();
-                            String Bfname = resultSet.getString("fname");                                    
-                                    
+                            String Bfname = resultSet.getString("fname");
+
                             // find one hop friends
                             selectQuery = "SELECT userID2 FROM friends WHERE userID1 = ?";
                             prepStatement = connection.prepareStatement(selectQuery);
@@ -1178,7 +1178,7 @@ public class FaceSpaceApp {
         }
         catch(SQLException Ex) {
             System.out.println("Error executing threeDegrees()");
-            System.out.println("Oracle Error: " + Ex.toString());
+            //System.out.println("Oracle Error: " + Ex.toString());
         }
         finally{
             try {
@@ -1244,12 +1244,17 @@ public class FaceSpaceApp {
                 prepStatement = connection.prepareStatement(selectQuery);
                 prepStatement.setDate(1, sqlReferenceDate);
                 resultSet = prepStatement.executeQuery();
-
                 //add number of messages recieved by each user
                  while(resultSet.next()) {
                     index = resultSet.getInt("recipientID");
-                    countTemp = countMap.get(index);
-                    countMap.put(index, (countTemp + resultSet.getInt("numInstances")));
+                    //if userID index has not been added to Map yet...add it
+                    if(countMap.get(index) == null){
+                        countMap.put(index,resultSet.getInt("numInstances"));
+                    }
+                    else {
+                        countTemp = countMap.get(index);
+                        countMap.put(index, (countTemp + resultSet.getInt("numInstances")));
+                    }
                 }
 
                 //go through all msgIDs that were sent to a group withing the time frame
@@ -1262,8 +1267,15 @@ public class FaceSpaceApp {
 
                     //add number of messages recieved by each user from a group Message
                     while(resultSet.next()) {
-                        countTemp = countMap.get(resultSet.getInt("recipientID"));
-                        countMap.put(resultSet.getInt("recipientID"),++countTemp);
+                        index = resultSet.getInt("recipientID");
+                        //if userID index has not been added to Map yet...add it
+                        if(countMap.get(index) == null){
+                            countMap.put(index,1);
+                        }
+                        else {
+                            countTemp = countMap.get(index);
+                            countMap.put(index,++countTemp);
+                        }
                     }
 
                     try { resultSet.close(); } catch (Exception ignore) { }
@@ -1281,30 +1293,30 @@ public class FaceSpaceApp {
                 int tempStore = -1;
                 //display data, users with same number of sent/recieved messages recieve the same Rank
                 System.out.println("\n"+"The Top "+numMessagers+" Messagers for the past "+numMonths+" Months:");
+                selectQuery = "SELECT fname,lname FROM users WHERE userID = ?";
+                prepStatement = connection.prepareStatement(selectQuery);
                 for(Entry<Integer, Integer> lValue:list) {
                     if(lValue.getValue() == tempStore){
                         tempID = lValue.getKey();
-                        selectQuery = "SELECT fname,lname FROM users WHERE userID = ?";
-                        prepStatement = connection.prepareStatement(selectQuery);
                         prepStatement.setLong(1, tempID);
                         resultSet = prepStatement.executeQuery();
-                        resultSet.next();
-                        System.out.print("Rank#"+(rank)+" ");
-                        System.out.println(resultSet.getString("fname")+" "+resultSet.getString("lname")+"(UserID-"+tempID+") Sent/Recieved "+lValue.getValue()+" messages.");
-                        //resultSet.close();
+                        //check to make sure there is a value in resultSet.next()
+                        if(resultSet.next()){
+                            System.out.print("Rank#"+(rank)+" ");
+                            System.out.println(resultSet.getString("fname")+" "+resultSet.getString("lname")+"(UserID-"+tempID+") Sent/Recieved "+lValue.getValue()+" messages.");
+                        }
                     }
                     else if(rank < numMessagers){
                         tempID = lValue.getKey();
-                        selectQuery = "SELECT fname,lname FROM users WHERE userID = ?";
-                        prepStatement = connection.prepareStatement(selectQuery);
                         prepStatement.setLong(1, tempID);
                         resultSet = prepStatement.executeQuery();
-                        resultSet.next();
-                        rank++;
-                        System.out.print("Rank#"+(rank)+" ");
-                        System.out.println(resultSet.getString("fname")+" "+resultSet.getString("lname")+"(UserID-"+tempID+") Sent/Recieved "+lValue.getValue()+" messages.");
-                        tempStore = lValue.getValue();
-                        //resultSet.close();
+                        //check to make sure there is a value in resultSet.next()
+                        if(resultSet.next()){
+                            rank++;
+                            System.out.print("Rank#"+(rank)+" ");
+                            System.out.println(resultSet.getString("fname")+" "+resultSet.getString("lname")+"(UserID-"+tempID+") Sent/Recieved "+lValue.getValue()+" messages.");
+                            tempStore = lValue.getValue();
+                        }
                     }
                     else{
                         break;
@@ -1319,7 +1331,7 @@ public class FaceSpaceApp {
         }
         catch(SQLException Ex) {
             System.out.println("Error executing topMessagers()");
-            System.out.println("Oracle Error: " + Ex.toString());
+            //System.out.println("Oracle Error: " + Ex.toString());
         }
         finally{
             try {
@@ -1375,7 +1387,7 @@ public class FaceSpaceApp {
         }
         catch(SQLException Ex) {
             System.out.println("Error executing dropUser()");
-            System.out.println("Oracle Error: " + Ex.toString());
+            //System.out.println("Oracle Error: " + Ex.toString());
         }
         finally{
             try {
