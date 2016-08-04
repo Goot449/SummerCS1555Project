@@ -1051,7 +1051,23 @@ public class FaceSpaceApp {
                         resultSet = prepStatement.executeQuery();
                         if(resultSet.next()) {
                             BID = resultSet.getLong("userID");
-
+                            
+                            // store the A user name for printing
+                            selectQuery = "SELECT fname FROM users WHERE userID = ?";
+                            prepStatement = connection.prepareStatement(selectQuery);
+                            prepStatement.setLong(1, AID);
+                            resultSet = prepStatement.executeQuery();
+                            resultSet.next();
+                            String Afname = resultSet.getString("fname");
+                                
+                            // store the B user name for printing
+                            selectQuery = "SELECT fname FROM users WHERE userID = ?";
+                            prepStatement = connection.prepareStatement(selectQuery);
+                            prepStatement.setLong(1, BID);
+                            resultSet = prepStatement.executeQuery();
+                            resultSet.next();
+                            String Bfname = resultSet.getString("fname");                                    
+                                    
                             // find one hop friends
                             selectQuery = "SELECT userID2 FROM friends WHERE userID1 = ?";
                             prepStatement = connection.prepareStatement(selectQuery);
@@ -1072,9 +1088,9 @@ public class FaceSpaceApp {
                             }
 
                             while(!hop1Stack.empty()){
-                                Long hop1ID = (Long)hop1Stack.pop();
+                                long hop1ID = hop1Stack.pop();
                                 if(hop1ID == BID) {
-                                    System.out.println(AID + " -> " + BID);
+                                    System.out.println(Afname + "(UserId-" + AID + ") -> " + Bfname + "(UserId-" + BID + ")");
                                 } else {
                                     // find two hop friends
                                     selectQuery = "SELECT userID2 FROM friends WHERE userID1 = ?";
@@ -1094,13 +1110,22 @@ public class FaceSpaceApp {
                                     resultSet = prepStatement.executeQuery();
                                     while(resultSet.next()){
                                         long friend2ID = resultSet.getLong("userID1");
-                                        hop2Stack.push(new Long(friend2ID));
+                                        if(friend2ID != AID){
+                                            hop2Stack.push(new Long(friend2ID));
+                                        }
                                     }
 
                                     while(!hop2Stack.empty()){
-                                        Long hop2ID = (Long)hop2Stack.pop();
+                                        long hop2ID = hop2Stack.pop();
+                                        // store hop1 user name
+                                        selectQuery = "SELECT fname FROM users WHERE userID = ?";
+                                        prepStatement = connection.prepareStatement(selectQuery);
+                                        prepStatement.setLong(1, hop1ID);
+                                        resultSet = prepStatement.executeQuery();
+                                        resultSet.next();
+                                        String hop1fname = resultSet.getString("fname");
                                         if(hop2ID == BID) {
-                                            System.out.println(AID + " -> " + hop1ID + " -> " + BID);
+                                            System.out.println(Afname + "(UserId-" + AID + ") -> " + hop1fname + "(UserId-" + hop1ID + ") -> " + Bfname + "(UserId-" + BID + ")");
                                         } else {
                                             // find three hop friends
                                             selectQuery = "SELECT userID2 FROM friends WHERE userID1 = ?";
@@ -1122,9 +1147,15 @@ public class FaceSpaceApp {
                                             }
 
                                             while(!hop3Stack.empty()){
-                                                Long hop3ID = (Long)hop3Stack.pop();
+                                                long hop3ID = hop3Stack.pop();
                                                 if(hop3ID == BID) {
-                                                    System.out.println(AID + " -> " + hop1ID + " -> " + hop2ID + " -> " + BID);
+                                                    selectQuery = "SELECT fname FROM users WHERE userID = ?";
+                                                    prepStatement = connection.prepareStatement(selectQuery);
+                                                    prepStatement.setLong(1, hop2ID);
+                                                    resultSet = prepStatement.executeQuery();
+                                                    resultSet.next();
+                                                    String hop2fname = resultSet.getString("fname");
+                                                    System.out.println(Afname + "(UserId-" + AID + ") -> " + hop1fname + "(UserId-" + hop1ID + ") -> "  + hop2fname + "(UserId-" + hop2ID + ") -> " + Bfname + "(UserId-" + BID + ")");
                                                 }
                                             }
                                         }
