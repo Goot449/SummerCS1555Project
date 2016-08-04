@@ -18,10 +18,7 @@ public class FaceSpaceApp {
     private PreparedStatement prepStatement; //used to create a prepared statement
     private ResultSet resultSet; //used to hold the result of your query
     private String query;  //this will hold the query we are using
-    //static Scanner scanner = new Scanner(System.in); //used to read user input
-
-    static Scanner scanner = new Scanner(System.in).useDelimiter(System.getProperty("line.separator"));
-    //scanner.useDelimiter(System.getProperty("line.separator"));
+    static Scanner scanner = new Scanner(System.in).useDelimiter(System.getProperty("line.separator")); //used to read user input
 
     public FaceSpaceApp(String mode){
         System.out.println("\n"+"Welcome to FaceSpace!");
@@ -190,42 +187,52 @@ public class FaceSpaceApp {
 
     public void createUser(String fname, String lname, String email, String dob){
         try{
-            java.util.Date date = null;
-            if (!dob.isEmpty()){
-                SimpleDateFormat sdf = new SimpleDateFormat("mm/dd/yyyy");
-                date = sdf.parse(dob);
-                if (!dob.equals(sdf.format(date))) {
-                    date = null;
+            //check to make sure user doesn't already exist
+            String selectQuery = "SELECT userID FROM users WHERE email = ?";
+            prepStatement = connection.prepareStatement(selectQuery);
+            prepStatement.setString(1, email);
+            resultSet = prepStatement.executeQuery();
+
+            if(!resultSet.next()){
+                java.util.Date date = null;
+                if (!dob.isEmpty()){
+                    SimpleDateFormat sdf = new SimpleDateFormat("mm/dd/yyyy");
+                    date = sdf.parse(dob);
+                    if (!dob.equals(sdf.format(date))) {
+                        date = null;
+                    }
                 }
-            }
-            // checks for valid user data
-            if( !fname.isEmpty() && !lname.isEmpty() && !email.isEmpty() &&  date != null){
-                // query number of users to increment to next user id
-                statement = connection.createStatement();
-                String selectQuery = "SELECT COUNT(*) AS total FROM users";
-                resultSet = statement.executeQuery(selectQuery);
-                resultSet.next();
-                int ids = resultSet.getInt("total");
-                ids++;
+                // checks for valid user data
+                if( !fname.isEmpty() && !lname.isEmpty() && !email.isEmpty() &&  date != null){
+                    // query number of users to increment to next user id
+                    statement = connection.createStatement();
+                    selectQuery = "SELECT COUNT(*) AS total FROM users";
+                    resultSet = statement.executeQuery(selectQuery);
+                    resultSet.next();
+                    int ids = resultSet.getInt("total");
+                    ids++;
 
-                // create insert query and fill in user fields
-                query = "insert into users values (?,?,?,?, TO_DATE(?, 'mm/dd/yyyy'), ?)";
-                prepStatement = connection.prepareStatement(query);
-                prepStatement.setLong(1, ids);
-                prepStatement.setString(2, fname);
-                prepStatement.setString(3, lname);
-                prepStatement.setString(4, email);
-                prepStatement.setString(5, dob);
-                java.util.Date time = new java.util.Date();
-                Timestamp current = new Timestamp(time.getTime());
-                prepStatement.setTimestamp(6, current);
+                    // create insert query and fill in user fields
+                    query = "insert into users values (?,?,?,?, TO_DATE(?, 'mm/dd/yyyy'), ?)";
+                    prepStatement = connection.prepareStatement(query);
+                    prepStatement.setLong(1, ids);
+                    prepStatement.setString(2, fname);
+                    prepStatement.setString(3, lname);
+                    prepStatement.setString(4, email);
+                    prepStatement.setString(5, dob);
+                    java.util.Date time = new java.util.Date();
+                    Timestamp current = new Timestamp(time.getTime());
+                    prepStatement.setTimestamp(6, current);
 
-                // run insert and notify user of success
-                prepStatement.executeUpdate();
-                resultSet.close();
-                System.out.println("User Account Created!");
+                    // run insert and notify user of success
+                    prepStatement.executeUpdate();
+                    resultSet.close();
+                    System.out.println("User Account Created!");
+                } else {
+                    System.out.println("Invalid user input: Make sure no values are empty and the date format is mm/dd/yyyy");
+                }
             } else {
-                System.out.println("Invalid user input: Make sure no values are empty and the date format is mm/dd/yyyy");
+                System.out.println("Sorry! A user with this email already exists!");
             }
         }
         catch(SQLException Ex) {

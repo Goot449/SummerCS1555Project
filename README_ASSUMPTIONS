@@ -15,4 +15,5 @@ Group: Nathan Spangler, Connor Kazmierczak, Jacob Guttenplan
 5. Methods check for user input errors but just return an error message.
     This is to ensure the driver doesn't get stuck in the method if an input is wrong.
 
+6. Names are case sensitive. To make things simple all names are lowercase.
 
