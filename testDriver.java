@@ -31,10 +31,46 @@ public class testDriver {
         testApp.displayFriends("spangy@gmail.com");
 
         //test createGroup()
-
+        System.out.println();
+        System.out.println("***Create DriverGroup with member limit 2***");
+        testApp.createGroup("DriverGroup","Group for testing",2);
 
         //test addToGroup()
+        System.out.println();
+        System.out.println("***Add Nate and Billy to DriverGroup***");
+        testApp.addToGroup("spangy@gmail.com","DriverGroup");
+        System.out.println("***Try to add Nate to DriverGroup even though he's already in***");
+        testApp.addToGroup("spangy@gmail.com","DriverGroup");
+        System.out.println("*Now Adding Billy to DriverGroup*");
+        testApp.addToGroup("testuser@gmail.com","DriverGroup");
 
+        System.out.println();
+        System.out.println("***Try to 3rd member to DriverGroup with Limit of 2***");
+        testApp.addToGroup("timjohn@gmail.com","DriverGroup");
+
+        System.out.println();
+        System.out.println("***Create DriverGroup again to make sure we get an error***");
+        testApp.createGroup("DriverGroup","this group should fail to create",6);
+
+        //displayMessages
+        System.out.println();
+        System.out.println("***Display Messages for Nate***");
+        testApp.displayMessages("spangy@gmail.com");
+
+        //sendMessage to user
+        System.out.println();
+        System.out.println("***Send Message directly to Billy***");
+        testApp.sendMessageToUser("Test User Subject","test user bod","testuser@gmail.com","jimjohn@gmail.com");
+
+        //sendMessage to group
+        System.out.println();
+        System.out.println("***Send Message to DriverGroup (that Billy is part of)***");
+        testApp.sendMessageToGroup("Test Group Subject","test group bod","DriverGroup","spangy@gmail.com");
+
+        //displayMessages
+        System.out.println();
+        System.out.println("***Display Messages for Billy***");
+        testApp.displayMessages("testuser@gmail.com");
 
         //test sendMessageToUser()
 
