@@ -5,16 +5,27 @@
 
 ***Running Procedure***
 1. source bash.env on unix
+
 2. Navigate to folder with source files
+
 3. Login to sqlplus
+
 4. type "start database.sql"
+
 5. Open a 2nd Unix Window
+
 6. source bash.env a 2nd time
+
 7. navigate to fold with source files
+
 8. compile java files "javac *.java"
+
 9. Execute FaceSpaceApp.java ("java FaceSpaceSpace.java")
+
     -FaceSpaceApp Accepts 1 of 2 arguments:
+
       1. 'user'  -in order to run all methods manually
+
       2. 'driver' - in order to have that testDriver class execute all methods
 
 

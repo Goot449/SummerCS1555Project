@@ -11,6 +11,7 @@ public class testDriver {
         testApp.createUser("billy","joe","testuser@gmail.com","04/05/1995");
         System.out.println();
 
+        //test to ensure you cannot create another user with same email
         System.out.println("***try to create user using Billy's email***");
         testApp.createUser("billy","joe","testuser@gmail.com","04/05/1995");
         System.out.println();

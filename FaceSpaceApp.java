@@ -868,7 +868,7 @@ public class FaceSpaceApp {
         }
         catch(SQLException Ex) {
             System.out.println("Error executing displayMessages()");
-            System.out.println("Oracle Error: " + Ex.toString());
+            //System.out.println("Oracle Error: " + Ex.toString());
         }
         finally{
             try {
