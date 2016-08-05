@@ -1,4 +1,4 @@
-//driver
+//driver for FaceSpaceApp
 //used to run and show all methods in FaceSpaceApp working properly
 
 public class testDriver {
@@ -10,7 +10,7 @@ public class testDriver {
         System.out.println("***create user Billy Joe***");
         testApp.createUser("billy","joe","testuser@gmail.com","04/05/1995");
         System.out.println();
-        
+
         System.out.println("***try to create user using Billy's email***");
         testApp.createUser("billy","joe","testuser@gmail.com","04/05/1995");
         System.out.println();
@@ -52,6 +52,7 @@ public class testDriver {
         System.out.println("***Try to 3rd member to DriverGroup with Limit of 2***");
         testApp.addToGroup("timjohn@gmail.com","DriverGroup");
 
+        //test createGroup() error message
         System.out.println();
         System.out.println("***Create DriverGroup again to make sure we get an error***");
         testApp.createGroup("DriverGroup","this group should fail to create",6);
@@ -128,25 +129,23 @@ public class testDriver {
         System.out.println();
         System.out.println("***Display Top 3 Messagers Over the past 5 months***");
         testApp.topMessagers(3,5);
-        
+
         //test dropUser()
         System.out.println();
         System.out.println("***Drop Nate from Users List***");
         testApp.dropUser("spangy@gmail.com");
-        
+
         System.out.println();
         System.out.println("***Show Billy's friends (notice Nate is gone)***");
         testApp.displayFriends("testuser@gmail.com");
-        
+
         System.out.println();
         System.out.println("***Display Messages for Nate after he is removed***");
         testApp.displayMessages("spangy@gmail.com");
-        
+
         System.out.println();
         System.out.println("***Display Messages for Billy the message from Nate is still there***");
         testApp.displayMessages("testuser@gmail.com");
-        
-
 
     }
 }

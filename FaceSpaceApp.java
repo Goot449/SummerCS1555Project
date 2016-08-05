@@ -1,3 +1,5 @@
+//FaceSpaceApp
+
 import java.sql.*;
 import java.text.ParseException;
 import java.util.Scanner;
@@ -835,7 +837,7 @@ public class FaceSpaceApp {
                         long messageID = resultSet.getLong("msgID");
                         resultStack.push(new Long(messageID));
                     }
-                    
+
                     selectQuery = "SELECT * FROM messages WHERE msgID = ?";
                     prepStatement = connection.prepareStatement(selectQuery);
                     while(!resultStack.empty()){

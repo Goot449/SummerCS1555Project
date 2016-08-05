@@ -1,4 +1,4 @@
---create database schema
+--create database schema for FaceSpaceApp
 --populate database with data
 
 DROP TABLE users CASCADE CONSTRAINTS;
